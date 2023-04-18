@@ -22,12 +22,6 @@ namespace GrpcGreeter
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    //#region disable TLS
-                    //webBuilder.ConfigureKestrel(options =>
-                    //{
-                    //    options.ListenLocalhost(5000, o => o.Protocols = HttpProtocols.Http2);
-                    //});
-                    //#endregion
                     webBuilder.UseStartup<Startup>();
                 });
     }

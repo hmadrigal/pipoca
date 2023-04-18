@@ -14,8 +14,11 @@ namespace GrpcGreeterClient
         {
             await Task.Delay(1000);
 
+            // Disables TLS, this switch must be set before creating the GrpcChannel/HttpClient.
+            AppContext.SetSwitch( "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
             // The port number(5001) must match the port of the gRPC server.
-            using var channel = GrpcChannel.ForAddress("https://localhost:58633");
+            using var channel = GrpcChannel.ForAddress("http://localhost:58634");
             var client = new Greeter.GreeterClient(channel);
             var cts = new CancellationTokenSource();
             _ = Task.Run(async () =>
