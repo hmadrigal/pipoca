@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
 
 namespace GrpcGreeter
@@ -21,6 +22,12 @@ namespace GrpcGreeter
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    //#region disable TLS
+                    //webBuilder.ConfigureKestrel(options =>
+                    //{
+                    //    options.ListenLocalhost(5000, o => o.Protocols = HttpProtocols.Http2);
+                    //});
+                    //#endregion
                     webBuilder.UseStartup<Startup>();
                 });
     }
