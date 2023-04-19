@@ -14,3 +14,27 @@ services:
       dockerfile: GrpcGreeterClient/Dockerfile
     depends_on:
       - grpcgreeterserver
+
+  tcpdump-server:
+    image: ${DOCKER_REGISTRY-}tcpdump
+    build:
+      context: .
+      dockerfile: TcpDump/Dockerfile
+    volumes:
+      - ../../dumps/:/data
+    network_mode: "service:grpcgreeterserver"
+    depends_on:
+      - grpcgreeterserver
+    entrypoint: [ "/usr/bin/tcpdump", "-i", "any", "-w", "/data/grpc-greeter-server-dump.pcap" ]
+
+  tcpdump-client:
+    image: ${DOCKER_REGISTRY-}tcpdump
+    build:
+      context: .
+      dockerfile: TcpDump/Dockerfile
+    volumes:
+      - ../../dumps/:/data
+    network_mode: "service:grpcgreeterclient"
+    depends_on:
+      - grpcgreeterclient
+    entrypoint: [ "/usr/bin/tcpdump", "-i", "any", "-w", "/data/grpc-greeter-client-dump.pcap" ]
