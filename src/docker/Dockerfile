@@ -16,3 +16,7 @@ RUN  \
     # Enable the extraction of all files \
     echo "# Enables extraction of all files" >> /usr/local/zeek/share/zeek/site/local.zeek ; \
     echo "@load frameworks/files/extract-all-files" >> /usr/local/zeek/share/zeek/site/local.zeek
+
+# TODO:
+#   - Allow docker files to be in JSON format for readability
+#   - Try to capture files from HTTP/2 (1st try with files from  HTTP/1.1)
