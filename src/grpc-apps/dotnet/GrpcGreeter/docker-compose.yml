@@ -25,7 +25,7 @@ services:
     network_mode: "service:grpcgreeterserver"
     depends_on:
       - grpcgreeterserver
-    entrypoint: [ "/usr/bin/tcpdump", "-i", "any", "-w", "/data/grpc-greeter-server-dump.pcap" ]
+    entrypoint: [ "/usr/bin/tcpdump", "-n", "-i", "any", "-w", "/data/grpc-greeter-server-dump.pcap" ]
 
   tcpdump-client:
     image: ${DOCKER_REGISTRY-}tcpdump
@@ -37,4 +37,4 @@ services:
     network_mode: "service:grpcgreeterclient"
     depends_on:
       - grpcgreeterclient
-    entrypoint: [ "/usr/bin/tcpdump", "-i", "any", "-w", "/data/grpc-greeter-client-dump.pcap" ]
+    entrypoint: [ "/usr/bin/tcpdump", "-n", "-i", "any", "-w", "/data/grpc-greeter-client-dump.pcap" ]
