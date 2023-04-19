@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -22,6 +23,20 @@ namespace GrpcGreeter
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    {
+                        webBuilder.ConfigureKestrel(options =>
+                        {
+                            var httpUrl = (Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? string.Empty)
+                                .Split(';')
+                                .Select(url => new Uri(url))
+                                .FirstOrDefault(i => i.Scheme == Uri.UriSchemeHttp);
+
+                            // Setup a HTTP/2 endpoint without TLS.
+                            options.ListenLocalhost(httpUrl.Port, o => o.Protocols =
+                                HttpProtocols.Http2);
+                        });
+                    }
                     webBuilder.UseStartup<Startup>();
                 });
     }

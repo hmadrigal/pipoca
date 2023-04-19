@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Net.Client;
@@ -19,7 +20,8 @@ namespace GrpcGreeterClient
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
             // The port number(5001) must match the port of the gRPC server.
-            var grpcServerUrlText = Environment.GetEnvironmentVariable("GRPC_SERVER_URL") ?? "http://localhost:5001";
+            var grpcServerUrlText = Environment.GetEnvironmentVariable("GRPC_SERVER_URL") ??
+                (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "http://localhost:58634" : "http://localhost:5001");
             Console.WriteLine($"gRPC Server URL: {grpcServerUrlText}");
             if (!Uri.TryCreate(grpcServerUrlText, UriKind.Absolute, out var grpcServerUri))
             {
