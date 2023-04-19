@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  grpcgreeterserver:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+    ports:
+      - "80"
+      - "443"
+    volumes:
+      - ${HOME}/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
+      - ${HOME}/.aspnet/https:/root/.aspnet/https:ro
+  grpcgreeterclient:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - GRPC_SERVER_URL=http://grpcgreeter-grpcgreeterserver-1
