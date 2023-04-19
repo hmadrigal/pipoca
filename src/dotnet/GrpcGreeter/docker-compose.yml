@@ -1,0 +1,16 @@
+version: '3.4'
+
+services:
+  grpcgreeterserver:
+    image: ${DOCKER_REGISTRY-}grpcgreeterserver
+    build:
+      context: .
+      dockerfile: GrpcGreeterServer/Dockerfile
+
+  grpcgreeterclient:
+    image: ${DOCKER_REGISTRY-}grpcgreeterclient
+    build:
+      context: .
+      dockerfile: GrpcGreeterClient/Dockerfile
+    depends_on:
+      - grpcgreeterserver

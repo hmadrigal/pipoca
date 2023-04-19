@@ -7,10 +7,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build
 WORKDIR /src
-COPY ["GrpcGreeterServer.csproj", "GrpcGreeterServer/"]
+COPY ["GrpcGreeterServer/GrpcGreeterServer.csproj", "GrpcGreeterServer/"]
 RUN dotnet restore "GrpcGreeterServer/GrpcGreeterServer.csproj"
 
-COPY . GrpcGreeterServer/
+COPY . .
 WORKDIR "/src/GrpcGreeterServer"
 RUN dotnet build "GrpcGreeterServer.csproj" -c Release -o /app/build
 
