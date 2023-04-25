@@ -7,8 +7,9 @@
 # Enables extraction of all files
 @load frameworks/files/extract-all-files
 
+# Use JSON for the log files
+redef LogAscii::use_json=T
+
 # Ignores checksum check
 redef ignore_checksums=T
-# Use JSON format instead of LOG format
-# Use json log format
-redef LogAscii::use_json=T
+
