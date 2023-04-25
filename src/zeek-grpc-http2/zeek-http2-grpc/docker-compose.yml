@@ -1,8 +1,8 @@
 version: '3.4'
 
 services:
-  zeekgrpchttp2:
-    image: ${DOCKER_REGISTRY-}zeekgrpchttp2
+  zeek-http2-grpc:
+    image: ${DOCKER_REGISTRY-}zeek-http2-grpc
     build:
       context: .
       dockerfile: Dockerfile
