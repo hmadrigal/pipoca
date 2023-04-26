@@ -29,7 +29,7 @@ RUN apt update \
 
 # configure local.zeek
 COPY local-append.zeek /tmp/local-append.zeek
-RUN  cat /tmp/local-append.zeek >> /usr/local/zeek/share/zeek/site/local.zeek \
+RUN  cat /tmp/local-append.zeek >> /opt/zeek/share/zeek/site/local.zeek \
     && rm /tmp/local-append.zeek
 
 ENTRYPOINT [ "/opt/zeek/bin/zeek" ]
