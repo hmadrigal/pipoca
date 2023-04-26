@@ -1,5 +1,7 @@
 FROM ubuntu:22.10
 
+VOLUME [ "/data" ]
+
 # Install zeek
 RUN apt update \
     && apt upgrade -y \
@@ -40,4 +42,6 @@ RUN \
     echo "redef ignore_checksums=T" >> /opt/zeek/share/zeek/site/local.zeek; \
     # Use JSON format instead of LOG format \
     echo "# Use json log format" >> /opt/zeek/share/zeek/site/local.zeek ; \
-    echo "redef LogAscii::use_json=T" >> /opt/zeek/share/zeek/site/local.zeek ; \
+    echo "redef LogAscii::use_json=T" >> /opt/zeek/share/zeek/site/local.zeek ;
+
+ENTRYPOINT [ "/opt/zeek/bin/zeek" ]
