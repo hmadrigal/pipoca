@@ -1,0 +1,53 @@
+zeek version 5.0.6
+usage: zeek [options] [file ...]
+usage: zeek --test [doctest-options] -- [options] [file ...]
+    <file>                          | Zeek script file, or read stdin
+    -a|--parse-only                 | exit immediately after parsing scripts
+    -b|--bare-mode                  | don't load scripts from the base/ directory
+    -c|--capture-unprocessed <file> | write unprocessed packets to a tcpdump file
+    -d|--debug-script               | activate Zeek script debugging
+    -e|--exec <zeek code>           | augment loaded scripts by given code
+    -f|--filter <filter>            | tcpdump filter
+    -h|--help                       | command line help
+    -i|--iface <interface>          | read from given interface (only one allowed)
+    -p|--prefix <prefix>            | add given prefix to Zeek script file resolution
+    -r|--readfile <readfile>        | read from given tcpdump file (only one allowed, pass '-' as the filename to read from stdin)
+    -s|--rulefile <rulefile>        | read rules from given file
+    -t|--tracefile <tracefile>      | activate execution tracing
+    -u|--usage-issues               | find variable usage issues and exit
+       --no-unused-warnings          | suppress warnings of unused functions/hooks/events
+    -v|--version                    | print version and exit
+    -w|--writefile <writefile>      | write to given tcpdump file
+    -C|--no-checksums               | ignore checksums
+    -D|--deterministic              | initialize random seeds to zero
+    -E|--event-trace <file>         | generate a replayable event trace to the given file
+    -F|--force-dns                  | force DNS
+    -G|--load-seeds <file>          | load seeds from given file
+    -H|--save-seeds <file>          | save seeds to given file
+    -I|--print-id <ID name>         | print out given ID
+    -N|--print-plugins              | print available plugins and exit (-NN for verbose)
+    -O|--optimize <option>          | enable script optimization (use -O help for options)
+    -0|--optimize-files=<pat>       | enable script optimization for all functions in files with names containing the given pattern
+    -o|--optimize-funcs=<pat>       | enable script optimization for functions with names fully matching the given pattern
+    -P|--prime-dns                  | prime DNS
+    -Q|--time                       | print execution time summary to stderr
+    -S|--debug-rules                | enable rule debugging
+    -T|--re-level <level>           | set 'RE_level' for rules
+    -U|--status-file <file>         | Record process status in file
+    -W|--watchdog                   | activate watchdog timer
+    -X|--zeekygen <cfgfile>         | generate documentation based on config file
+    --profile-scripts[=file]        | profile scripts to given file (default stdout)
+    --pseudo-realtime[=<speedup>]   | enable pseudo-realtime for performance evaluation (default 1)
+    -j|--jobs                       | enable supervisor mode
+    --test                          | run unit tests ('--test -h' for help, not available when built without ENABLE_ZEEK_UNIT_TESTS)
+    $ZEEKPATH                       | file search path (.:/usr/local/zeek/share/zeek:/usr/local/zeek/share/zeek/policy:/usr/local/zeek/share/zeek/site:/usr/local/zeek/share/zeek/builtin-plugins:/spicy:/usr/local/zeek/share/zeek/builtin-plugins/Zeek_Spicy:/usr/local/zeek/lib/zeek/plugins/packages/bro-http2/scripts)
+    $ZEEK_PLUGIN_PATH               | plugin search path (/usr/local/zeek/lib/zeek/plugins)
+    $ZEEK_PLUGIN_ACTIVATE           | plugins to always activate ()
+    $ZEEK_PREFIXES                  | prefix list ()
+    $ZEEK_DNS_FAKE                  | disable DNS lookups (off)
+    $ZEEK_SEED_FILE                 | file to load seeds from (not set)
+    $ZEEK_LOG_SUFFIX                | ASCII log file extension (.log)
+    $ZEEK_PROFILER_FILE             | Output file for script execution statistics (not set)
+    $ZEEK_DISABLE_ZEEKYGEN          | Disable Zeekygen documentation support (not set)
+    $ZEEK_DNS_RESOLVER              | IPv4/IPv6 address of DNS resolver to use (not set, will use first IPv4 address from /etc/resolv.conf)
+    $ZEEK_DEBUG_LOG_STDERR          | Use stderr for debug logs generated via the -B flag
