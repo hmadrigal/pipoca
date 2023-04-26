@@ -1,10 +1,10 @@
 version: '3.4'
 
 services:
-  zeek-http2-grpc:
-    image: ${DOCKER_REGISTRY-}zeek-http2-grpc
+  zeek-grpc-http2:
+    image: ${DOCKER_REGISTRY-}zeek-grpc-http2
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ../dumps/:/data
+      - ../../data:/data
