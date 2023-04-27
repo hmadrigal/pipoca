@@ -4,7 +4,8 @@ opt_docker_image="zeek-grpc-http2"
 opt_docker_file="zeekurity-zeek:lts/Dockerfile"
 opt_docker_build="false"
 opt_docker_run="false"
-opt_docker_data_path=""
+opt_docker_vol_data="-v ${PWD}/../../data:/data"
+opt_docker_entrypoint=
 
 USAGE="Usage:  ${CMD:=${0##*/}} [(-v|--verbose)] [--name=TEXT] [(-o|--output) FILE] [ARGS...]"
 
@@ -20,6 +21,8 @@ while [ "$1" != "$EOL" ]; do
     #EDIT HERE: defined options
          --name    ) check "$1" "$opt"; opt_docker_image="$1"; shift;;
          --file    ) check "$1" "$opt"; opt_docker_file="$1"; shift;;
+         --data  ) check "$1" "$opt"; opt_docker_vol_data="v $1:/data"; shift;;
+         --entrypoint ) check "$1" "$opt"; opt_docker_entrypoint="--entrypoint $1"; shift;;
          --build   ) opt_docker_build='true';;
          --run     ) opt_docker_run='true';;
     # -o | --output  ) check "$1" "$opt"; opt_output="$1"; shift;;
@@ -46,5 +49,6 @@ if [[ $opt_docker_build == 'true' ]]; then
 fi
 
 if [[ $opt_docker_run == 'true' ]]; then
-    docker run -it --rm --name $opt_docker_image-container $opt_docker_image $*
+    # docker run -it --rm --name $opt_docker_image-container $opt_docker_image $*
+    docker run -it --rm $opt_docker_vol_data $opt_docker_entrypoint $opt_docker_image
 fi
