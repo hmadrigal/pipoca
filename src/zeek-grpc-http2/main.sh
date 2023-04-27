@@ -1,8 +1,10 @@
 #!/usr/bin/env sh
 
 opt_docker_image="zeek-grpc-http2"
-opt_docker_file="ubuntu-22.10/Dockerfile"
+opt_docker_file="zeekurity-zeek:lts/Dockerfile"
 opt_docker_build="false"
+opt_docker_run="false"
+opt_docker_data_path=""
 
 USAGE="Usage:  ${CMD:=${0##*/}} [(-v|--verbose)] [--name=TEXT] [(-o|--output) FILE] [ARGS...]"
 
@@ -19,6 +21,7 @@ while [ "$1" != "$EOL" ]; do
          --name    ) check "$1" "$opt"; opt_docker_image="$1"; shift;;
          --file    ) check "$1" "$opt"; opt_docker_file="$1"; shift;;
          --build   ) opt_docker_build='true';;
+         --run     ) opt_docker_run='true';;
     # -o | --output  ) check "$1" "$opt"; opt_output="$1"; shift;;
     -v | --verbose ) opt_verbose='true';;
     -h | --help    ) printf "%s\n" "$USAGE"; exit 0;;
@@ -40,4 +43,8 @@ fi
 
 if [[ $opt_docker_build == 'true' ]]; then
     docker build -t $opt_docker_image -f $opt_docker_file $(dirname $opt_docker_file)
+fi
+
+if [[ $opt_docker_run == 'true' ]]; then
+    docker run -it --rm --name $opt_docker_image-container $opt_docker_image $*
 fi
