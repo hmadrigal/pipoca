@@ -8,8 +8,7 @@
 @load frameworks/files/extract-all-files
 
 # Use JSON for the log files
-redef LogAscii::use_json=T
+redef LogAscii::use_json=T;
 
 # Ignores checksum check
-redef ignore_checksums=T
-
+redef ignore_checksums=T;

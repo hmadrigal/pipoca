@@ -21,7 +21,7 @@ services:
       context: .
       dockerfile: TcpDump/Dockerfile
     volumes:
-      - ../../../dumps/:/data
+      - ../../../../data/pcap/:/data
     network_mode: "service:grpcgreeterserver"
     depends_on:
       - grpcgreeterserver
@@ -33,7 +33,7 @@ services:
       context: .
       dockerfile: TcpDump/Dockerfile
     volumes:
-      - ../../../dumps/:/data
+      - ../../../../data/pcap/:/data
     network_mode: "service:grpcgreeterclient"
     depends_on:
       - grpcgreeterclient
