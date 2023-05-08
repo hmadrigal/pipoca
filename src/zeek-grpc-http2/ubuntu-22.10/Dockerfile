@@ -13,6 +13,9 @@ RUN apt update \
     && apt update \
     && apt install -y zeek-lts
 
+# Disables warning about port change
+RUN echo -e "\n# Starting with Zeek 5.2 changes from 47760 to 27760. \nZeekPort = 27760\n"  >> /opt/zeek/etc/zeekctl.cfg
+
 ENV PATH="${PATH}:/opt/zeek/bin"
 
 # Prevent zeek from capturing some troublesome elements from network stack
