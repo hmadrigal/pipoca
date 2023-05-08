@@ -23,9 +23,8 @@ RUN apt update \
     && apt upgrade -y \
     && apt list --upgradable \
     && apt install -y ethtool \
-    && export network_devices=$(nmcli device status |  sed -n '1d;p' | grep 'ethernet' | awk '{ print $1}') \
-    && for nd in "$network_devices"; do $(for i in rx tx sg tso ufo gso gro lro; do ethtool -K $nd $i off; done); done \
-    && unset network_devices
+    && network_devices=`nmcli device status |  sed -n '1d;p' | grep 'ethernet' | awk '{ print $1}'` \
+    && for nd in "$network_devices"; do $(for i in rx tx sg tso ufo gso gro lro; do ethtool -K $nd $i off; done); done
 
 # Install HTTP2 plugin
 RUN apt update \
