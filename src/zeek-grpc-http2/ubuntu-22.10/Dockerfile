@@ -15,13 +15,16 @@ RUN apt update \
 
 ENV PATH="${PATH}:/opt/zeek/bin"
 
-# # Prevent zeek from capturing some troublesome elements from  network stack
-# RUN apt update \
-#     && apt upgrade -y \
-#     && apt list --upgradable \
-#     && apt install -y ethtool \
-#     && $(for i in rx tx sg tso ufo gso gro lro; do ethtool -K eth0 $i off; done)
+# Prevent zeek from capturing some troublesome elements from network stack
+RUN apt update \
+    && apt upgrade -y \
+    && apt list --upgradable \
+    && apt install -y ethtool \
+    && export network_devices=$(nmcli device status |  sed -n '1d;p' | grep 'ethernet' | awk '{ print $1}') \
+    && for nd in "$network_devices"; do $(for i in rx tx sg tso ufo gso gro lro; do ethtool -K $nd $i off; done); done \
+    && unset network_devices
 
+# Install HTTP2 plugin
 RUN apt update \
     && apt upgrade -y \
     && apt list --upgradable \
@@ -30,12 +33,11 @@ RUN apt update \
     && zkg install --force zeek/mitrecnd/bro-http2 \
     && zkg refresh
 
-# configure local.zeek
+# Configure local.zeek
 COPY local-append.zeek /tmp/local-append.zeek
 RUN  cat /tmp/local-append.zeek >> /opt/zeek/share/zeek/site/local.zeek \
     && rm /tmp/local-append.zeek \
     && zeek_random_seed=`cat /dev/urandom | tr -dc '[:alpha:]' | fold -w ${1:-256} | head -n 1` \
     && sed -i "s/Please change this value./${zeek_random_seed}/g" /opt/zeek/share/zeek/site/local.zeek
-    # && zkg env > zkg_env.tmp; while read p; do eval "$p"; done < zkg_env.tmp ; rm zkg_env.tmp
 
 ENTRYPOINT [ "/opt/zeek/bin/zeek" ]
