@@ -1,0 +1,11 @@
+module PROTOBUF;
+
+import spicy;
+
+# See Protobuf encoding at https://protobuf.dev/programming-guides/encoding/
+
+public type ReadRequest = unit {
+    filename: bytes &until=b"\x00";   # [5]
+
+    on %done { print self; }
+};
