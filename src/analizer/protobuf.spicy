@@ -4,8 +4,8 @@ import spicy;
 
 # See Protobuf encoding at https://protobuf.dev/programming-guides/encoding/
 
-public type ReadRequest = unit {
-    filename: bytes &until=b"\x00";   # [5]
+public type Varint = unit {
+    f0: uint8[] &until-including=($$ & uint8(8) != 0) foreach { print "0x%x" % $$; }
 
-    on %done { print self; }
+    on %done { self; }
 };
