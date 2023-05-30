@@ -4,8 +4,37 @@ import spicy;
 
 # See Protobuf encoding at https://protobuf.dev/programming-guides/encoding/
 
-public type Varint = unit {
-    f0: uint8[] &until-including=($$ & uint8(8) != 0) foreach { print "0x%x" % $$; }
+type Foo  = unit {
+    f: bitfield(8) {
+        data: 0..6 &convert=cast<uint8>($$);
+        is_last: 7 &convert=cast<bool>($$); 
+    } ;
+};
 
-    on %done { self; }
+function fn_varint(v: vector<Foo>) : uint64 {
+    return cast<uint64>(0);
+} 
+
+
+public type Varint = unit {
+    # &max-size=10 
+    f0: Foo[] &until-including=( ! $$.f.is_last )  { 
+
+        local i : uint8  = 1;
+        local c : uint64 = 0; 
+        local n : uint64 = 0;
+        local o : uint8;
+        while (i <= |$$| ) {
+            c = $$[|$$|-i].f.data ;
+            o = (i-1) * 7;
+            n = n | (c << o);
+            print "c=0x%x n=0x%x o=%d" % (c,n,o);
+
+            i++;
+        }
+        
+    }
+    # f1: fn_varint(self.f0)
+
+    on %done { print self; }
 };
