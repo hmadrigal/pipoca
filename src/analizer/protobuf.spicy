@@ -2,11 +2,26 @@ module PROTOBUF;
 
 import spicy;
 
+type WireType = enum {
+    # int32, int64, uint32, uint64, sint32, sint64, bool, enum
+    VARINT = 0 ,
+	# fixed64, sfixed64, double
+    I64 = 1,
+    # string, bytes, embedded messages, packed repeated fields
+    LEN = 2,
+    # group start (deprecated)
+    SGROUP = 3,
+    # group end (deprecated)
+    EGROUP = 4,
+    # fixed32, sfixed32, float
+    I32 = 5
+};
+
 # See Protobuf encoding at https://protobuf.dev/programming-guides/encoding/
 
-# TODO: Reconsider whether to use VarIntSegment or deal with bytes instead
+# TODO: Reconsider whether to use VarintSegment or deal with bytes instead
 # Segment is 8-bit. 0..6 are a part of the value, 7 is a flag to indicate last segment.
-public type VarIntSegment  = unit {
+type VarintSegment  = unit {
     f: bitfield(8) {
         data: 0..6 &convert=cast<uint8>($$);
         is_last: 7 &convert=cast<bool>($$); 
@@ -14,9 +29,9 @@ public type VarIntSegment  = unit {
 };
 
 # https://protobuf.dev/programming-guides/encoding/#varints
-public type VarInt = unit {
+type Varint = unit {
     # &max-size=10 
-    segments: VarIntSegment[] &until-including=( ! $$.f.is_last ) { 
+    segments: VarintSegment[] &until-including=( ! $$.f.is_last ) { 
         # self.value is computed based on segments
         local i : uint8  = 0;
         local c : uint64 = 0; 
@@ -36,31 +51,63 @@ public type VarInt = unit {
 
     var value: uint64 &optional;
 
-    on %done { print self; }
+    #on %done { print self; }
 } &convert=self.value;
 
 # https://protobuf.dev/programming-guides/encoding/#structure
 # tag is a varint encoded value where 3 lower bits are wire_type and remaining bits are field number
-public type Tag = unit {
-    varint: VarInt {  
+type Tag = unit {
+    varint: Varint {  
         self.field_number = $$ >> 3;
-        self.wire_type = cast<uint8>(($$ << 61) >> 61);
+        self.wire_type = WireType(($$ << 61) >> 61);
      }
 
     var field_number: uint64 &optional;
-    var wire_type: uint8 &optional;
+    var wire_type: WireType &optional;
 
-    on %done { print self; }
+    #on %done { print self; }
 };
+
+#type I64 = unit {
+#
+#};
+
+type Len = unit {
+    # size encoded as int32 varint
+    size: Varint;
+};
+
+#type SGroup = unit {
+#
+#};
+
+#type EGroup = unit {
+#
+#};
+
+#type I32 = unit {
+#
+#};
 
 # https://protobuf.dev/programming-guides/encoding/#structure
 # Record is computed by a tag and a value. Value length depends on the tag.
-public type Record = unit {
+type Record = unit {
     tag: Tag;
+
+    switch ( self.tag.wire_type ) { 
+        #WireType::VARINT -> varint: Varint;
+        #WireType::I64    -> i64: I64;
+        WireType::LEN    -> len: Len;
+        #WireType::SGROUP -> sgroup: SGroup;
+        #WireType::EGROUP -> egroup: EGroup;
+        #WireType::I32    -> i32: I32;
+    };
 };
 
 # https://protobuf.dev/programming-guides/encoding/#structure
 # Message is made of a sequence of Records
 public type Message = unit {
     records : Record[] ;
+
+    on %done { print self; }
 };
