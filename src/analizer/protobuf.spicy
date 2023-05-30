@@ -20,19 +20,19 @@ public type Varint = unit {
     # &max-size=10 
     f0: Foo[] &until-including=( ! $$.f.is_last )  { 
 
-        local i : uint8  = 1;
+        local i : uint8  = 0;
         local c : uint64 = 0; 
         local n : uint64 = 0;
         local o : uint8;
-        while (i <= |$$| ) {
-            c = $$[|$$|-i].f.data ;
-            o = (i-1) * 7;
+        while (i < |$$| ) {
+            c = $$[i].f.data ;
+            o = i * 7;
             n = n | (c << o);
             print "c=0x%x n=0x%x o=%d" % (c,n,o);
 
             i++;
         }
-        
+        print n;
     }
     # f1: fn_varint(self.f0)
 
