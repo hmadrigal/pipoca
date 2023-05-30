@@ -75,6 +75,7 @@ type Tag = unit {
 type Len = unit {
     # size encoded as int32 varint
     size: Varint;
+    data: bytes &size=self.size;
 };
 
 #type SGroup = unit {
