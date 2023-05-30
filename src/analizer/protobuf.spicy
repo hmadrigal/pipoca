@@ -4,6 +4,7 @@ import spicy;
 
 # See Protobuf encoding at https://protobuf.dev/programming-guides/encoding/
 
+# TODO: Reconsider whether to use VarIntSegment or deal with bytes instead
 # Segment is 8-bit. 0..6 are a part of the value, 7 is a flag to indicate last segment.
 public type VarIntSegment  = unit {
     f: bitfield(8) {
@@ -50,4 +51,16 @@ public type Tag = unit {
     var wire_type: uint8 &optional;
 
     on %done { print self; }
+};
+
+# https://protobuf.dev/programming-guides/encoding/#structure
+# Record is computed by a tag and a value. Value length depends on the tag.
+public type Record = unit {
+    tag: Tag;
+};
+
+# https://protobuf.dev/programming-guides/encoding/#structure
+# Message is made of a sequence of Records
+public type Message = unit {
+    records : Record[] ;
 };
