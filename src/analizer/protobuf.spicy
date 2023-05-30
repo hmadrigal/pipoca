@@ -5,7 +5,7 @@ import spicy;
 # See Protobuf encoding at https://protobuf.dev/programming-guides/encoding/
 
 # Segment is 8-bit. 0..6 are a part of the value, 7 is a flag to indicate last segment.
-type VarIntSegment  = unit {
+public type VarIntSegment  = unit {
     f: bitfield(8) {
         data: 0..6 &convert=cast<uint8>($$);
         is_last: 7 &convert=cast<bool>($$); 
@@ -37,3 +37,17 @@ public type VarInt = unit {
 
     on %done { print self; }
 } &convert=self.value;
+
+# https://protobuf.dev/programming-guides/encoding/#structure
+# tag is a varint encoded value where 3 lower bits are wire_type and remaining bits are field number
+public type Tag = unit {
+    varint: VarInt {  
+        self.field_number = $$ >> 3;
+        self.wire_type = cast<uint8>(($$ << 61) >> 61);
+     }
+
+    var field_number: uint64 &optional;
+    var wire_type: uint8 &optional;
+
+    on %done { print self; }
+};
