@@ -1,23 +1,17 @@
 module PROTOBUF;
 
 import spicy;
+# See Protobuf encoding at https://protobuf.dev/programming-guides/encoding/
 
 type WireType = enum {
-    # int32, int64, uint32, uint64, sint32, sint64, bool, enum
     VARINT = 0 ,
-	# fixed64, sfixed64, double
     I64 = 1,
-    # string, bytes, embedded messages, packed repeated fields
     LEN = 2,
-    # group start (deprecated)
     SGROUP = 3,
-    # group end (deprecated)
     EGROUP = 4,
-    # fixed32, sfixed32, float
     I32 = 5
 };
 
-# See Protobuf encoding at https://protobuf.dev/programming-guides/encoding/
 
 # TODO: Reconsider whether to use VarintSegment or deal with bytes instead
 # Segment is 8-bit. 0..6 are a part of the value, 7 is a flag to indicate last segment.
@@ -28,10 +22,9 @@ type VarintSegment  = unit {
     } ;
 };
 
-# https://protobuf.dev/programming-guides/encoding/#varints
 type Varint = unit {
-    # &max-size=10 
-    segments: VarintSegment[] &until-including=( ! $$.f.is_last ) { 
+    # &max-size=10
+    segments: VarintSegment[]  &until-including=( ! $$.f.is_last ) { 
         # self.value is computed based on segments
         local i : uint8  = 0;
         local c : uint64 = 0; 
@@ -42,7 +35,6 @@ type Varint = unit {
             o = i * 7;
             n = n | (c << o);
             # print "c=0x%x n=0x%x o=%d" % (c,n,o);
-
             i++;
         }
         # print n;
@@ -68,66 +60,10 @@ type Tag = unit {
     #on %done { print "Done: %s" %  self ; }
 };
 
-type I64 = unit {
-    # encoded as 8-byte little-endian;
-    # memcpy of the equivalent C types (u?int32_t, float)
-    data: bytes &size=8;
-};
-
-type Len = unit {
-    # size encoded as int32 varint
-    size: Varint;
-    # (message | string | bytes | packed)
-    data: bytes &size=self.size {
-        local s: string;
-        #s = cast<string>($$);
-        #print cast<Message>($$);
-    }
-    #text: string &parse-from=self.data;
-    #var message: Message &optional;
-};
-
-#type SGroup = unit {
-#
-#};
-
-#type EGroup = unit {
-#
-#};
-
-type I32 = unit {
-    # encoded as 4-byte little-endian;
-    # memcpy of the equivalent C types (u?int32_t, float)
-    data: bytes &size=4;
-};
-
-# https://protobuf.dev/programming-guides/encoding/#structure
-# Record is computed by a tag and a value. Value length depends on the tag.
-type Record = unit {
-    tag: Tag;
-
-    switch ( self.tag.wire_type ) { 
-        WireType::VARINT -> varint: Varint;
-        WireType::I64    -> i64: I64 &optional ;
-        WireType::LEN    -> len: Len &optional ;
-        #WireType::SGROUP -> sgroup: SGroup &optional ;
-        #WireType::EGROUP -> egroup: EGroup &optional ;
-        WireType::I32    -> i32: I32 &optional ;
-    };
-};
-
-# https://protobuf.dev/programming-guides/encoding/#structure
-# Message is made of a sequence of Records
-type Message = unit {
-    records : Record[] ;
-
-    on %done { print "Done: %s" %  self ; }
-};
-
-type Lnt = unit {
+type LengthPrefixed = unit {
     s: Varint;
-    t: bytes &requires=( self.s > 0 ) &size=self.s;
-    # d: Fld &requires=( self.s > 0 );
+    t: bytes &requires=( self.s > 0 ) &size=self.s ;
+    # m: Msg &try &optional &parse-from=self.t ;
 
     # Perform logging for these %confirmed and %rejected.
     # on %confirmed { print "--Confirmed: %s" % self; }
@@ -139,13 +75,13 @@ type Lnt = unit {
     # }
 };
 
-type Fld = unit {
+type Field = unit {
     tag: Tag;
 
     switch ( self.tag.wire_type ) { 
         WireType::VARINT -> varint: Varint;
         WireType::I64    -> i64: bytes &size=8 ;
-        WireType::LEN    -> len: Lnt ;
+        WireType::LEN    -> len: LengthPrefixed ;
         #WireType::SGROUP -> sgroup: SGroup ;
         #WireType::EGROUP -> egroup: EGroup ;
         WireType::I32    -> i32: bytes &size=4 ;
@@ -154,7 +90,15 @@ type Fld = unit {
     # on %done { print "Done: %s" %  self ; }
 };
 
-public type Msg = unit {
-    flds : Fld[];
+public type Message = unit {
+    fields : Field[];
     on %done { print "Done: %s" %  self ; }
+
+    # on %error(msg: string) { 
+    #     print "--Message: %s" % msg;
+    #     print "--Error: %s" % self; 
+    #     if ( is_trying ){
+    #         self.backtrack();
+    #     }
+    # }
 };
