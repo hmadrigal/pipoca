@@ -118,8 +118,43 @@ type Record = unit {
 
 # https://protobuf.dev/programming-guides/encoding/#structure
 # Message is made of a sequence of Records
-public type Message = unit {
+type Message = unit {
     records : Record[] ;
 
+    on %done { print "Done: %s" %  self ; }
+};
+
+type Lnt = unit {
+    s: Varint;
+    t: bytes &requires=( self.s > 0 ) &size=self.s;
+    # d: Fld &requires=( self.s > 0 );
+
+    # Perform logging for these %confirmed and %rejected.
+    # on %confirmed { print "--Confirmed: %s" % self; }
+    # on %rejected { print "--Rejected: %s" % self; }
+    # on %done { print "--Done: %s" % self; }
+    # on %error(msg: string) { 
+    #     print "--Message: %s" % msg;
+    #     print "--Error: %s" % self; 
+    # }
+};
+
+type Fld = unit {
+    tag: Tag;
+
+    switch ( self.tag.wire_type ) { 
+        WireType::VARINT -> varint: Varint;
+        WireType::I64    -> i64: bytes &size=8 ;
+        WireType::LEN    -> len: Lnt ;
+        #WireType::SGROUP -> sgroup: SGroup ;
+        #WireType::EGROUP -> egroup: EGroup ;
+        WireType::I32    -> i32: bytes &size=4 ;
+    };
+
+    # on %done { print "Done: %s" %  self ; }
+};
+
+public type Msg = unit {
+    flds : Fld[];
     on %done { print "Done: %s" %  self ; }
 };
