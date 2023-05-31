@@ -61,10 +61,10 @@ type Tag = unit {
 };
 
 type LengthPrefixed = unit {
-    size: Varint;
-    text: bytes &requires=( self.size > 0 ) &size=self.size ;
-    # m: Msg &try &parse-from=self.t ;
-
+    size: Varint ;
+    # message: Message &try ;
+    text: bytes &requires=( self.size > 0 ) &size=self.size;
+    
     # Perform logging for these %confirmed and %rejected.
     # on %confirmed { print "--Confirmed: %s" % self; }
     # on %rejected { print "--Rejected: %s" % self; }
@@ -94,11 +94,12 @@ public type Message = unit {
     fields : Field[];
     on %done { print "Done: %s" %  self ; }
 
-    # on %error(msg: string) { 
-    #     print "--Message: %s" % msg;
-    #     print "--Error: %s" % self; 
-    #     if ( is_trying ){
-    #         self.backtrack();
-    #     }
-    # }
+    on %error(msg: string) { 
+        print "--Message: %s" % msg;
+        print "--Error: %s" % self; 
+        # self.backtrack();
+        # if ( is_trying ){
+        #     self.backtrack();
+        # }
+    }
 };
