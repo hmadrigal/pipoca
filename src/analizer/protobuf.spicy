@@ -61,9 +61,9 @@ type Tag = unit {
 };
 
 type LengthPrefixed = unit {
-    s: Varint;
-    t: bytes &requires=( self.s > 0 ) &size=self.s ;
-    # m: Msg &try &optional &parse-from=self.t ;
+    size: Varint;
+    text: bytes &requires=( self.size > 0 ) &size=self.size ;
+    # m: Msg &try &parse-from=self.t ;
 
     # Perform logging for these %confirmed and %rejected.
     # on %confirmed { print "--Confirmed: %s" % self; }
