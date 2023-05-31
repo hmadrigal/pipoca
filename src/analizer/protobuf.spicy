@@ -56,6 +56,10 @@ type Tag = unit {
         self.wire_type = WireType(($$ << 61) >> 61);
      }
 
+     on %done {
+        print "field_number:%s wire_type:%s" % ( self.field_number, self.wire_type ) ;
+     }
+
 };
 
 type SubMessage = unit {
@@ -77,6 +81,10 @@ type LengthPrefixed = unit {
     sub_message: SubMessage;
     text: bytes &requires=( self.size > 0 ) &size=self.size;
 
+    on %done {
+        print "Text=%s" % ( self.text );
+        print "SubMessage=%s" % ( self.sub_message );
+    }
 };
 
 type Field = unit {
@@ -96,6 +104,5 @@ type Field = unit {
 public type Message = unit {
 
     fields : Field[];
-    
-    on %done { print "Done: %s" %  self ; }
+
 };
