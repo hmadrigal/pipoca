@@ -68,9 +68,11 @@ type Tag = unit {
     #on %done { print self; }
 };
 
-#type I64 = unit {
-#
-#};
+type I64 = unit {
+    # encoded as 8-byte little-endian;
+    # memcpy of the equivalent C types (u?int32_t, float)
+    data: bytes &size=8;
+};
 
 type Len = unit {
     # size encoded as int32 varint
@@ -86,9 +88,11 @@ type Len = unit {
 #
 #};
 
-#type I32 = unit {
-#
-#};
+type I32 = unit {
+    # encoded as 4-byte little-endian;
+    # memcpy of the equivalent C types (u?int32_t, float)
+    data: bytes &size=4;
+};
 
 # https://protobuf.dev/programming-guides/encoding/#structure
 # Record is computed by a tag and a value. Value length depends on the tag.
@@ -96,12 +100,12 @@ type Record = unit {
     tag: Tag;
 
     switch ( self.tag.wire_type ) { 
-        #WireType::VARINT -> varint: Varint;
-        #WireType::I64    -> i64: I64;
-        WireType::LEN    -> len: Len;
-        #WireType::SGROUP -> sgroup: SGroup;
-        #WireType::EGROUP -> egroup: EGroup;
-        #WireType::I32    -> i32: I32;
+        WireType::VARINT -> varint: Varint;
+        WireType::I64    -> i64: I64 &optional ;
+        WireType::LEN    -> len: Len &optional ;
+        #WireType::SGROUP -> sgroup: SGroup &optional ;
+        #WireType::EGROUP -> egroup: EGroup &optional ;
+        WireType::I32    -> i32: I32 &optional ;
     };
 };
 
