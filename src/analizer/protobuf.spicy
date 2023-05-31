@@ -1,8 +1,7 @@
 module PROTOBUF;
-
 import spicy;
-# See Protobuf encoding at https://protobuf.dev/programming-guides/encoding/
 
+# See Protobuf encoding at https://protobuf.dev/programming-guides/encoding/
 type WireType = enum {
     VARINT = 0 ,
     I64 = 1,
@@ -23,7 +22,6 @@ type VarintSegment  = unit {
 };
 
 type Varint = unit {
-    # &max-size=10
     segments: VarintSegment[]  &until-including=( ! $$.f.is_last );
     on segments { 
         # self.value is computed based on segments
@@ -35,31 +33,29 @@ type Varint = unit {
             c = $$[i].f.data ;
             o = i * 7;
             n = n | (c << o);
-            # print "c=0x%x n=0x%x o=%d" % (c,n,o);
             i++;
         }
-        # print n;
         self.value = n;
     }
 
     var value: uint64 &optional;
 
-    #on %done { print "Done: %s" %  self ; }
 } &convert=self.value;
 
 # https://protobuf.dev/programming-guides/encoding/#structure
 # tag is a varint encoded value where 3 lower bits are wire_type and remaining bits are field number
 type Tag = unit {
+
     varint: Varint ;
+
+    var field_number: uint64 &optional;
+    var wire_type: WireType &optional;
+
     on varint {  
         self.field_number = $$ >> 3;
         self.wire_type = WireType(($$ << 61) >> 61);
      }
 
-    var field_number: uint64 &optional;
-    var wire_type: WireType &optional;
-
-    #on %done { print "Done: %s" %  self ; }
 };
 
 type SubMessage = unit {
@@ -71,29 +67,21 @@ type SubMessage = unit {
     on %init() { self.start = self.input(); }
 
     on %error(msg: string) { 
-        print "SubMessage::Error: %s" % msg;
         self.set_input(self.start);
     }
 };
 
 type LengthPrefixed = unit {
+
     size: Varint ;
     sub_message: SubMessage;
     text: bytes &requires=( self.size > 0 ) &size=self.size;
-    
-    # Perform logging for these %confirmed and %rejected.
-    # on %confirmed { print "--Confirmed: %s" % self; }
-    # on %rejected { print "--Rejected: %s" % self; }
-    # on %done { print "--Done: %s" % self; }
-    # on %error(msg: string) { 
-    #     print "--Message: %s" % msg;
-    #     print "--Error: %s" % self; 
-    # }
+
 };
 
 type Field = unit {
-    tag: Tag;
 
+    tag: Tag;
     switch ( self.tag.wire_type ) { 
         WireType::VARINT -> varint: Varint;
         WireType::I64    -> i64: bytes &size=8 ;
@@ -103,10 +91,10 @@ type Field = unit {
         WireType::I32    -> i32: bytes &size=4 ;
     };
 
-    # on %done { print "Done: %s" %  self ; }
 };
 
 public type Message = unit {
+
     fields : Field[];
     
     on %done { print "Done: %s" %  self ; }
