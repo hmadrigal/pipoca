@@ -66,15 +66,19 @@ type SubMessage = unit {
     
     fields : Field[];
 
+    var start: iterator<stream>;
+
+    on %init() { self.start = self.input(); }
+
     on %error(msg: string) { 
-        print "Error: %s" % msg;
-        self.backtrack();
+        print "SubMessage::Error: %s" % msg;
+        self.set_input(self.start);
     }
 };
 
 type LengthPrefixed = unit {
     size: Varint ;
-    message: SubMessage &try ;
+    sub_message: SubMessage;
     text: bytes &requires=( self.size > 0 ) &size=self.size;
     
     # Perform logging for these %confirmed and %rejected.
