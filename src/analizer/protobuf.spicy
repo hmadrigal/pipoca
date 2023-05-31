@@ -60,9 +60,17 @@ type Tag = unit {
     #on %done { print "Done: %s" %  self ; }
 };
 
+type SubMessage = unit {
+    fields : Field[];
+    on %error(msg: string) { 
+        print "Error: %s" % msg;
+        self.backtrack();
+    }
+};
+
 type LengthPrefixed = unit {
     size: Varint ;
-    # message: Message &try ;
+    message: SubMessage &try ;
     text: bytes &requires=( self.size > 0 ) &size=self.size;
     
     # Perform logging for these %confirmed and %rejected.
@@ -93,13 +101,4 @@ type Field = unit {
 public type Message = unit {
     fields : Field[];
     on %done { print "Done: %s" %  self ; }
-
-    on %error(msg: string) { 
-        print "--Message: %s" % msg;
-        print "--Error: %s" % self; 
-        # self.backtrack();
-        # if ( is_trying ){
-        #     self.backtrack();
-        # }
-    }
 };
