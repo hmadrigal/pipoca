@@ -51,7 +51,7 @@ type Varint = unit {
 
     var value: uint64 &optional;
 
-    #on %done { print self; }
+    #on %done { print "Done: %s" %  self ; }
 } &convert=self.value;
 
 # https://protobuf.dev/programming-guides/encoding/#structure
@@ -65,7 +65,7 @@ type Tag = unit {
     var field_number: uint64 &optional;
     var wire_type: WireType &optional;
 
-    #on %done { print self; }
+    #on %done { print "Done: %s" %  self ; }
 };
 
 type I64 = unit {
@@ -77,7 +77,14 @@ type I64 = unit {
 type Len = unit {
     # size encoded as int32 varint
     size: Varint;
-    data: bytes &size=self.size;
+    # (message | string | bytes | packed)
+    data: bytes &size=self.size {
+        local s: string;
+        #s = cast<string>($$);
+        #print cast<Message>($$);
+    }
+    #text: string &parse-from=self.data;
+    #var message: Message &optional;
 };
 
 #type SGroup = unit {
@@ -114,5 +121,5 @@ type Record = unit {
 public type Message = unit {
     records : Record[] ;
 
-    on %done { print self; }
+    on %done { print "Done: %s" %  self ; }
 };
