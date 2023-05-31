@@ -24,7 +24,8 @@ type VarintSegment  = unit {
 
 type Varint = unit {
     # &max-size=10
-    segments: VarintSegment[]  &until-including=( ! $$.f.is_last ) { 
+    segments: VarintSegment[]  &until-including=( ! $$.f.is_last );
+    on segments { 
         # self.value is computed based on segments
         local i : uint8  = 0;
         local c : uint64 = 0; 
@@ -49,7 +50,8 @@ type Varint = unit {
 # https://protobuf.dev/programming-guides/encoding/#structure
 # tag is a varint encoded value where 3 lower bits are wire_type and remaining bits are field number
 type Tag = unit {
-    varint: Varint {  
+    varint: Varint ;
+    on varint {  
         self.field_number = $$ >> 3;
         self.wire_type = WireType(($$ << 61) >> 61);
      }
@@ -61,7 +63,9 @@ type Tag = unit {
 };
 
 type SubMessage = unit {
+    
     fields : Field[];
+
     on %error(msg: string) { 
         print "Error: %s" % msg;
         self.backtrack();
@@ -100,5 +104,6 @@ type Field = unit {
 
 public type Message = unit {
     fields : Field[];
+    
     on %done { print "Done: %s" %  self ; }
 };
