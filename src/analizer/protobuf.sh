@@ -6,4 +6,4 @@ if [[ -z "${input}" ]]; then
     exit 1;
 fi
 
-printf "${input}" | spicy-driver protobuf.spicy
+printf "${input}" | spicy-driver --debug --show-backtraces --report-times --skip-dependencies protobuf.spicy
