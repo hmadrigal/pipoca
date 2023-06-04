@@ -1,18 +1,13 @@
 #pragma once
 
-// #include <cstdio>
-// #include <string>
 #include <vector>
 
-#include "zeek/Val.h"
+#include <zeek/Val.h>
 
 #include "VarintUtils.h"
-// #include "zeek/file_analysis/Analyzer.h"
-// #include "zeek/file_analysis/File.h"
-// #include "zeek/file_analysis/analyzer/extract/events.bif.h"
 
-namespace zeek::file_analysis::detail
-	{
+namespace plugin {
+namespace Demo_ProtobufAnalyzer {
 
 class BufferReader
 	{
@@ -37,3 +32,4 @@ public:
 	};
 
 	}
+}

@@ -1,17 +1,15 @@
 #pragma once
 
 #include <tuple>
-// #include <cstdio>
-// #include <string>
 
-#include "zeek/Val.h"
-// #include "zeek/file_analysis/Analyzer.h"
-// #include "zeek/file_analysis/File.h"
-// #include "zeek/file_analysis/analyzer/extract/events.bif.h"
+#include <zeek/Val.h>
 
-namespace zeek::file_analysis::detail
+namespace plugin
+{
+	namespace Demo_ProtobufAnalyzer
 	{
 
-std::tuple<uint64_t, uint64_t> DecodeVarint(std::vector<u_char> buffer, uint64_t offset);
+		std::tuple<uint64_t, uint64_t> DecodeVarint(std::vector<u_char> buffer, uint64_t offset);
 
 	}
+}
