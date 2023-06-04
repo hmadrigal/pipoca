@@ -13,7 +13,7 @@ namespace zeek::plugin::detail::Zeek_Protobuf
 			zeek::plugin::Configuration Configure() override;
 	};
 
-	// extern Plugin plugin;
+	extern Plugin plugin;
 
 }
 
