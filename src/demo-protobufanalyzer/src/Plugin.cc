@@ -11,8 +11,8 @@ namespace zeek::plugin::detail::Zeek_Protobuf
 {
 	zeek::plugin::Configuration Plugin::Configure()
 	{
-		AddComponent(new zeek::file_analysis::Component(
-			"PROTOBUF", zeek::file_analysis::detail::Protobuf::Instantiate));
+		// AddComponent(new zeek::file_analysis::Component(
+		// 	"PROTOBUF", zeek::file_analysis::detail::Protobuf::Instantiate));
 
 		zeek::plugin::Configuration config;
 		config.name = "Demo::ProtobufAnalyzer";
