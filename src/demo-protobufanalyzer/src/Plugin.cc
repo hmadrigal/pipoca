@@ -1,10 +1,5 @@
 
 #include "Plugin.h"
-#include "Protobuf.h"
-
-#include <zeek/plugin/Plugin.h>
-#include <zeek/file_analysis/Component.h>
-#include <zeek/file_analysis/analyzer/extract/Extract.h>
 
 namespace plugin { namespace Demo_ProtobufAnalyzer { Plugin plugin; } }
 
@@ -14,6 +9,7 @@ zeek::plugin::Configuration Plugin::Configure()
 {
 	plugin::Demo_ProtobufAnalyzer::plugin.AddComponent(new zeek::file_analysis::Component(
 		"PROTOBUF", plugin::Demo_ProtobufAnalyzer::Protobuf::Instantiate));
+
 	zeek::plugin::Configuration config;
 	config.name = "Demo::ProtobufAnalyzer";
 	config.description = "Prototype for a ProtocolBuf decoder.";

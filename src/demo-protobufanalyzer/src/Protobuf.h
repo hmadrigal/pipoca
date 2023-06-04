@@ -6,9 +6,11 @@
 #include "BufferReader.h"
 #include "events.bif.h"
 
-#include <zeek/Val.h>
 #include <zeek/Event.h>
+#include <zeek/ZeekString.h>
+#include <zeek/Val.h>
 #include <zeek/file_analysis/Analyzer.h>
+#include <zeek/file_analysis/Component.h>
 #include <zeek/file_analysis/File.h>
 
 namespace plugin
@@ -34,10 +36,10 @@ namespace plugin
 			FIXED32 = 5
 		};
 
-		class Protobuf : public file_analysis::Analyzer
+		class Protobuf : public zeek::file_analysis::Analyzer
 		{
 		public:
-			static file_analysis::Analyzer *Instantiate(RecordValPtr args, file_analysis::File *file);
+			static zeek::file_analysis::Analyzer *Instantiate(zeek::RecordValPtr args, zeek::file_analysis::File *file);
 
 			bool DeliverStream(const u_char *data, uint64_t len) override;
 
@@ -50,7 +52,7 @@ namespace plugin
 			bool ProtobufDisplay(std::vector<ProtobufPart> parts);
 
 		protected:
-			Protobuf(RecordValPtr args, file_analysis::File *file);
+			Protobuf(zeek::RecordValPtr args, zeek::file_analysis::File *file);
 
 		private:
 			std::vector<u_char> buffer;

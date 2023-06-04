@@ -97,7 +97,7 @@ namespace plugin
 					// trigger event using value
 					const u_char *data = part.value.data();
 					zeek::event_mgr.Enqueue(protobuf_string, GetFile()->ToVal(),
-											zeek::make_intrusive<zeek::StringVal>(new String(data, part.value.size(), false)));
+											zeek::make_intrusive<zeek::StringVal>(new zeek::String(data, part.value.size(), false)));
 				}
 				break;
 			}
@@ -129,7 +129,7 @@ namespace plugin
 			return true;
 		}
 
-		file_analysis::Analyzer *Protobuf::Instantiate(RecordValPtr args, file_analysis::File *file)
+		zeek::file_analysis::Analyzer *Protobuf::Instantiate(zeek::RecordValPtr args, zeek::file_analysis::File *file)
 		{
 			return new Protobuf(std::move(args), file);
 		}
