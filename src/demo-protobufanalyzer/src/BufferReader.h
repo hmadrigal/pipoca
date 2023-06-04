@@ -26,6 +26,8 @@ public:
 
 	void Checkpoint(void);
 
+	void ResetToCheckpoint(void);
+
 	std::tuple<uint64_t, std::vector<u_char>> ReadVarint();
 
 	std::vector<u_char> ReadBuffer(uint64_t length);

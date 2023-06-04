@@ -44,5 +44,10 @@ namespace plugin
 			savedOffset = offset;
 		}
 
-	}
+        void BufferReader::ResetToCheckpoint(void)
+        {
+			offset = savedOffset;
+        }
+
+    }
 }

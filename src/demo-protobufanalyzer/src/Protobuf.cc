@@ -18,7 +18,9 @@ Protobuf::DecodeProto(std::vector<u_char> data)
 
 	BufferReader reader = BufferReader(data);
 
-	while ( reader.LeftBytes() > 0 )
+	try
+	{
+		while ( reader.LeftBytes() > 0 )
 		{
 		reader.Checkpoint();
 
@@ -66,6 +68,12 @@ Protobuf::DecodeProto(std::vector<u_char> data)
 		// 	                        zeek::make_intrusive<zeek::StringVal>(str));
 		// 	}
 		}
+	}
+	catch(const std::exception& e)
+	{
+		reader.ResetToCheckpoint();
+	}
+
 
 	std::vector<u_char> leftOver = reader.ReadBuffer(reader.LeftBytes());
 	return std::make_tuple(parts, leftOver);
