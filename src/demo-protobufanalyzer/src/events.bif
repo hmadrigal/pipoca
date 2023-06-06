@@ -5,6 +5,5 @@
 ##
 ## text: The detected text.
 ##
-## .. zeek:see:: Files::add_analyzer Files::ANALYZER_MD5
-##    Files::ANALYZER_SHA1 Files::ANALYZER_SHA256
+## .. zeek:see:: Files::add_analyzer Files::ANALYZER_PROTOBUF
 event protobuf_string%(f: fa_file, text: string%);

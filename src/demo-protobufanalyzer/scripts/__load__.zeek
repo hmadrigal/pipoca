@@ -8,4 +8,4 @@
 # only on explicit `@load <plugin-namespace>/<plugin-name>`.
 #
 
-event zeek_init() { print "Demo::ProtobufAnalyzer is loaded"; }
+@load ./main

@@ -1,116 +1,17 @@
-##! Local site policy. Customize as appropriate.
-##!
-##! This file will not be overwritten when upgrading or reinstalling!
-
-# Installation-wide salt value that is used in some digest hashes, e.g., for
-# the creation of file IDs. Please change this to a hard to guess value.
-redef digest_salt = "Please change this value.";
-
-# This script logs which scripts were loaded during each run.
-@load misc/loaded-scripts
-
-# Apply the default tuning scripts for common tuning settings.
-@load tuning/defaults
-
-# Estimate and log capture loss.
-@load misc/capture-loss
-
-# Enable logging of memory, packet and lag statistics.
-@load misc/stats
-
-# Load the scan detection script.  It's disabled by default because
-# it often causes performance issues.
-#@load misc/scan
-
-# Detect traceroute being run on the network. This could possibly cause
-# performance trouble when there are a lot of traceroutes on your network.
-# Enable cautiously.
-#@load misc/detect-traceroute
-
-# Generate notices when vulnerable versions of software are discovered.
-# The default is to only monitor software found in the address space defined
-# as "local".  Refer to the software framework's documentation for more
-# information.
-@load frameworks/software/vulnerable
-
-# Detect software changing (e.g. attacker installing hacked SSHD).
-@load frameworks/software/version-changes
-
-# This adds signatures to detect cleartext forward and reverse windows shells.
-@load-sigs frameworks/signatures/detect-windows-shells
-
-# Load all of the scripts that detect software in various protocols.
-@load protocols/ftp/software
-@load protocols/smtp/software
-@load protocols/ssh/software
-@load protocols/http/software
-# The detect-webapps script could possibly cause performance trouble when
-# running on live traffic.  Enable it cautiously.
-#@load protocols/http/detect-webapps
-
-# This script detects DNS results pointing toward your Site::local_nets
-# where the name is not part of your local DNS zone and is being hosted
-# externally.  Requires that the Site::local_zones variable is defined.
-@load protocols/dns/detect-external-names
-
-# Script to detect various activity in FTP sessions.
-@load protocols/ftp/detect
-
-# Scripts that do asset tracking.
-@load protocols/conn/known-hosts
-@load protocols/conn/known-services
-@load protocols/ssl/known-certs
-
-# This script enables SSL/TLS certificate validation.
-@load protocols/ssl/validate-certs
-
-# This script prevents the logging of SSL CA certificates in x509.log
-@load protocols/ssl/log-hostcerts-only
-
-# If you have GeoIP support built in, do some geographic detections and
-# logging for SSH traffic.
-@load protocols/ssh/geo-data
-# Detect hosts doing SSH bruteforce attacks.
-@load protocols/ssh/detect-bruteforcing
-# Detect logins using "interesting" hostnames.
-@load protocols/ssh/interesting-hostnames
-
-# Detect SQL injection attacks.
-@load protocols/http/detect-sqli
-
-#### Network File Handling ####
-
-# Enable MD5 and SHA1 hashing for all files.
-@load frameworks/files/hash-all-files
-
-# Detect SHA1 sums in Team Cymru's Malware Hash Registry.
-@load frameworks/files/detect-MHR
-
-# Extend email alerting to include hostnames
-@load policy/frameworks/notice/extend-email/hostnames
-
-# Uncomment the following line to enable detection of the heartbleed attack. Enabling
-# this might impact performance a bit.
-# @load policy/protocols/ssl/heartbleed
-
-# Uncomment the following line to enable logging of connection VLANs. Enabling
-# this adds two VLAN fields to the conn.log file.
-# @load policy/protocols/conn/vlan-logging
-
-# Uncomment the following line to enable logging of link-layer addresses. Enabling
-# this adds the link-layer address for each connection endpoint to the conn.log file.
-# @load policy/protocols/conn/mac-logging
-
-# Uncomment this to source zkg's package state
-# @load packages
 # Enables http2 analyzer
 @load http2
 
 # Enables http2 intel framework extensions
 @load http2/intel
 
+# Enables custom pages
+@load packages
+
 # Enables extraction of all files
-@load frameworks/files/extract-all-files
+# @load frameworks/files/extract-all-files
+
+# Enables Protobuf Analyzer
+# @load demo-protobufanalyzer
 
 # Use JSON for the log files
 redef LogAscii::use_json=T;
@@ -118,22 +19,108 @@ redef LogAscii::use_json=T;
 # Ignores checksum check
 redef ignore_checksums=T;
 
-# event file_sniff(f: fa_file, meta: fa_metadata)
-# {
-#     if ( ! meta?$mime_type ) return;
-#     print "new file", f$id;
-#     if ( meta$mime_type == "text/plain" )
-#         Files::add_analyzer(f, Files::ANALYZER_MD5);
-# }
-
-# event file_hash(f: fa_file, kind: string, hash: string)
-# {
-#     print "file_hash", f$id, kind, hash;
-# }
-
-
-event protobuf_string(f: fa_file, text: string)
-{
-    print "protobuf::text->", text;
+export {
+	type ProtobufInfo: record 
+    {
+		## Filename for the entity if discovered from a header.
+		contentType: string &optional;
+	};
 }
 
+
+redef record HTTP2::Info += {
+    protobufinfo:          ProtobufInfo  &optional;
+};
+
+redef record fa_file += {
+    protobufinfo:          ProtobufInfo  &optional;
+};
+
+
+
+
+# =============================== Logic to detect gRPC over HTTP2 and request file analysis
+
+event http2_begin_entity(c: connection, is_orig: bool, stream: count, contentType: string) &priority=10
+{
+    print "[http2_begin_entity]";
+    c$http2$protobufinfo = ProtobufInfo();
+}
+
+event http2_header(c: connection, is_orig: bool, stream: count, name: string, value: string) &priority=3
+{
+    print "[http2_header_event]";
+
+    if ( name == "CONTENT-TYPE" 
+        && /[aA][pP][pP][lL][iI][cC][aA][tT][iI][oO][nN]\/[gG][rR][pP][cC]*/ in value )
+    {
+		# Detected content gRPC
+        print "FOUND gRPC!!!", value;
+        if ( c?$http2 && c$http2?$protobufinfo )
+        {
+            c$http2$protobufinfo$contentType = "application/grpc";
+            print "c.http2.protobufinfo.contentType set to" , c$http2$protobufinfo$contentType;
+        }
+    }
+
+}
+
+event file_over_new_connection(f: fa_file, c: connection, is_orig: bool) &priority=5
+{
+    print "[file_over_new_connection]";
+    f$protobufinfo=c$http2$protobufinfo;
+
+}
+
+event file_sniff(f: fa_file, meta: fa_metadata) &priority=5
+{
+    print "[file_sniff]";
+    print "f.protobufinfo", f$protobufinfo;
+    if (f?$protobufinfo 
+        && f$protobufinfo?$contentType 
+        && f$protobufinfo$contentType == "application/grpc")
+    {
+        print "PROTO FILE DETECTED!!";
+    }
+}
+
+event http2_end_entity(c: connection, is_orig: bool, stream: count) &priority=5
+{
+    print "[http2_end_entity]";
+	if ( c?$http2 && c$http2?$protobufinfo )
+    {
+		delete c$http2$protobufinfo;
+	}
+}
+
+
+
+# event file_sniff(f: fa_file, meta: fa_metadata)
+# {
+#     print "[file_sniff]";
+#     print "[file_sniff][fa_file]", f;
+#     print "[file_sniff][fa_metadata]", meta;
+
+#     if ( ! f?$source ) return;
+#     if ( f?$source == "HTTP2" )
+#         Files::add_analyzer(f, Files::ANALYZER_MD5);
+        
+
+#     # print "** ON: file_sniff= **";
+#     # print "** WITH: f: fa_file **", f;
+#     # print "** WITH: meta: fa_metadata **", meta;
+#     # # f?$source=HTTP2
+#     # if ( ! meta?$mime_type ) return;
+#     # print "File=", f$id, "MIME type=", meta$mime_type;
+#     # #if ( meta$mime_type == "text/plain" )
+#     # #    Files::add_analyzer(f, Files::ANALYZER_MD5);
+# }
+
+# event http2_begin_entity(c: connection, is_orig: bool, stream: count, contentType: string)
+# {
+#     print "[http2_begin_entity]";
+#     print "[http2_begin_entity][contentType]", contentType;
+#     print "[http2_begin_entity][is_orig]", is_orig;
+#     print "[http2_begin_entity][stream]", stream;
+#     print "[http2_begin_entity][connection]", c;
+# }
