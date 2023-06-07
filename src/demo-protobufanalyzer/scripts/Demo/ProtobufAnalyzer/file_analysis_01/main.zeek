@@ -1,17 +1,8 @@
 # Enables http2 analyzer
 @load http2
 
-# Enables http2 intel framework extensions
-@load http2/intel
-
-# Enables custom pages
+# Enables custom pages (for instance: PROTOBUF)
 @load packages
-
-# Enables extraction of all files
-# @load frameworks/files/extract-all-files
-
-# Enables Protobuf Analyzer
-# @load demo-protobufanalyzer
 
 # Use JSON for the log files
 redef LogAscii::use_json=T;
@@ -24,8 +15,8 @@ redef ignore_checksums=T;
 export {
 	type ProtobufInfo: record 
     {
-		## Filename for the entity if discovered from a header.
-		contentType: string &optional;
+		is_gRPC: bool &optional;
+        is_orig: bool &optional;
 	};
 }
 
@@ -38,36 +29,79 @@ redef record fa_file += {
     protobufinfo:          ProtobufInfo  &optional;
 };
 
-event http2_begin_entity(c: connection, is_orig: bool, stream: count, contentType: string) &priority=10
+function init_protobuf_info(c: connection)
 {
-    # print "[http2_begin_entity]";
+    if ( ! ( c?$http2 && c$http2?$protobufinfo ) )
+    {
+        print "c.http2.protobufinfo is not defined";
+        c$http2$protobufinfo = ProtobufInfo();
+        c$http2$protobufinfo$is_gRPC = F;
+    }
+}
 
-    c$http2$protobufinfo = ProtobufInfo();
+event http2_request(c: connection, is_orig: bool, stream: count, method: string, authority: string, host: string, original_URI: string, unescaped_URI: string, version: string, push: bool)
+{
+    print "[http2_request]";
+    print "    original_URI", original_URI;
+    # print "    method", method;
+    # print "    authority", authority;
+    # print "    host", host;
+    # print "    original_URI", original_URI;
+    # print "    unescaped_URI", unescaped_URI;
+    # print "    version", version;
+    # print "    push", push;
+    #c$http2$protobufinfo = ProtobufInfo();
 }
 
 event http2_header(c: connection, is_orig: bool, stream: count, name: string, value: string) &priority=3
 {
-    # print "[http2_header_event]";
+    local is_grpc : bool = ( name == "CONTENT-TYPE" && value == "application/grpc" );
 
-    if ( name == "CONTENT-TYPE" 
-        && /[aA][pP][pP][lL][iI][cC][aA][tT][iI][oO][nN]\/[gG][rR][pP][cC]*/ in value )
+    print "[http2_header_event]";
+    # print "    name", name;
+    # print "    value", value;
+    # print "    is_orig: ", is_orig;
+    # print "    is_grpc: ", is_grpc;
+
+    if( is_grpc )
     {
-		# Detected content gRPC
-        # print "FOUND gRPC!!!", value;
-        if ( c?$http2 && c$http2?$protobufinfo )
-        {
-            c$http2$protobufinfo$contentType = "application/grpc";
-            # print "c.http2.protobufinfo.contentType set to" , c$http2$protobufinfo$contentType;
-        }
+        print "    is_grpc: ", is_grpc;
+        print "    name", name;
+        print "    value", value;
+    }
+    
+    init_protobuf_info(c);
+    c$http2$protobufinfo$is_gRPC = c$http2$protobufinfo$is_gRPC || is_grpc;
+    if( is_grpc )
+    {
+        print "    Updating c.http2.protobufinfo.is_gRPC to", c$http2$protobufinfo$is_gRPC;
     }
 
+}
+
+event http2_begin_entity(c: connection, is_orig: bool, stream: count, contentType: string) &priority=10
+{
+    print "[http2_begin_entity]";
+    # print "    is_orig", is_orig;
+    # print "    http2", c$http2;
+
+    # c$http2$protobufinfo = ProtobufInfo();
+    # c$http2$protobufinfo$is_gRPC = F;
+    # c$http2$protobufinfo$is_orig = is_orig;
 }
 
 event file_over_new_connection(f: fa_file, c: connection, is_orig: bool) &priority=5
 {
     # print "[file_over_new_connection]";
 
-    f$protobufinfo=c$http2$protobufinfo;
+    if ( c?$http2 && c$http2?$protobufinfo )
+    {
+        f$protobufinfo = c$http2$protobufinfo;
+    }else{
+        init_protobuf_info(c);
+        print " no connection info on file_over_new_connection";
+    }
+    # f$protobufinfo = c$http2$protobufinfo;
 
 }
 
@@ -75,13 +109,14 @@ event file_sniff(f: fa_file, meta: fa_metadata) &priority=5
 {
     # print "[file_sniff]";
     # print "f.protobufinfo", f$protobufinfo;
+    Files::add_analyzer(f, Files::ANALYZER_PROTOBUF);
 
     if (f?$protobufinfo 
-        && f$protobufinfo?$contentType 
-        && f$protobufinfo$contentType == "application/grpc")
+        && f$protobufinfo?$is_gRPC 
+        && f$protobufinfo$is_gRPC == T )
     {
         # print "PROTO FILE DETECTED!! Calling ANALYZER_PROTOBUF";
-        Files::add_analyzer(f, Files::ANALYZER_PROTOBUF);
+        # Files::add_analyzer(f, Files::ANALYZER_PROTOBUF);
     }
 }
 
@@ -95,10 +130,11 @@ event http2_end_entity(c: connection, is_orig: bool, stream: count) &priority=5
 	}
 }
 
+
 # =============================== Handling gRPC text event
 event protobuf_string(f: fa_file, text: string)
 {
     print "[protobuf_string]";
+    print "    text", text;
 
-    print "text", text;
 }
