@@ -27,7 +27,7 @@ namespace plugin
 			std::vector<u_char> data(buffer.begin() + offset, buffer.begin() + offset + length + 1);
 			offset += length;
 
-			std::cout << "[VAR] value: " << value << " length: " << length << std::endl;
+			// std::cout << "[VAR] value: " << value << " length: " << length << std::endl;
 
 			return std::make_tuple(value, data);
 		}

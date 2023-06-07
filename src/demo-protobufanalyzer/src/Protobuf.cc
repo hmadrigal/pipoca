@@ -36,18 +36,16 @@ namespace plugin
 
 			const auto [parts, _] = DecodeProto(buffer);
 
-			for (auto part : parts)
-			{
-				std::cout  << "byteRange: [" << part.byteRangeStart << "," << part.byteRangeEnd << "] index: " << part.index << " type: " << part.type << " value: ";
-				for (auto v : part.value)
-				{
-					// std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)v << " ";
-					std::cout << (int)v << " ";
-				}
-			}
-			
+			// for (auto part : parts)
+			// {
+			// 	std::cout  << "byteRange: [" << part.byteRangeStart << "," << part.byteRangeEnd << "] index: " << part.index << " type: " << part.type << " value: ";
+			// 	for (auto v : part.value)
+			// 	{
+			// 		// std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)v << " ";
+			// 		std::cout << (int)v << " ";
+			// 	}
+			// }
 
-			// return true;
 			return ProtobufDisplay(parts);
 		}
 

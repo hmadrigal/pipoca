@@ -40,24 +40,24 @@ redef record fa_file += {
 
 event http2_begin_entity(c: connection, is_orig: bool, stream: count, contentType: string) &priority=10
 {
-    print "[http2_begin_entity]";
+    # print "[http2_begin_entity]";
 
     c$http2$protobufinfo = ProtobufInfo();
 }
 
 event http2_header(c: connection, is_orig: bool, stream: count, name: string, value: string) &priority=3
 {
-    print "[http2_header_event]";
+    # print "[http2_header_event]";
 
     if ( name == "CONTENT-TYPE" 
         && /[aA][pP][pP][lL][iI][cC][aA][tT][iI][oO][nN]\/[gG][rR][pP][cC]*/ in value )
     {
 		# Detected content gRPC
-        print "FOUND gRPC!!!", value;
+        # print "FOUND gRPC!!!", value;
         if ( c?$http2 && c$http2?$protobufinfo )
         {
             c$http2$protobufinfo$contentType = "application/grpc";
-            print "c.http2.protobufinfo.contentType set to" , c$http2$protobufinfo$contentType;
+            # print "c.http2.protobufinfo.contentType set to" , c$http2$protobufinfo$contentType;
         }
     }
 
@@ -65,29 +65,29 @@ event http2_header(c: connection, is_orig: bool, stream: count, name: string, va
 
 event file_over_new_connection(f: fa_file, c: connection, is_orig: bool) &priority=5
 {
-    print "[file_over_new_connection]";
-    
+    # print "[file_over_new_connection]";
+
     f$protobufinfo=c$http2$protobufinfo;
 
 }
 
 event file_sniff(f: fa_file, meta: fa_metadata) &priority=5
 {
-    print "[file_sniff]";
-    print "f.protobufinfo", f$protobufinfo;
+    # print "[file_sniff]";
+    # print "f.protobufinfo", f$protobufinfo;
 
     if (f?$protobufinfo 
         && f$protobufinfo?$contentType 
         && f$protobufinfo$contentType == "application/grpc")
     {
-        print "PROTO FILE DETECTED!! Calling ANALYZER_PROTOBUF";
+        # print "PROTO FILE DETECTED!! Calling ANALYZER_PROTOBUF";
         Files::add_analyzer(f, Files::ANALYZER_PROTOBUF);
     }
 }
 
 event http2_end_entity(c: connection, is_orig: bool, stream: count) &priority=5
 {
-    print "[http2_end_entity]";
+    # print "[http2_end_entity]";
 
 	if ( c?$http2 && c$http2?$protobufinfo )
     {
@@ -100,6 +100,5 @@ event protobuf_string(f: fa_file, text: string)
 {
     print "[protobuf_string]";
 
-    # print "f", f;
     print "text", text;
 }
