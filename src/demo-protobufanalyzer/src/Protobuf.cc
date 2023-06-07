@@ -84,7 +84,7 @@ namespace plugin
 					else if (type == TYPES::LENDELIM)
 					{
 						const auto [length, _] = reader.ReadVarint();
-						std::cout << "[LEN] TYPES::LENDELIM length: " << length << std::endl;
+						// std::cout << "[LEN] TYPES::LENDELIM length: " << length << std::endl;
 						value = reader.ReadBuffer(length);
 						// for (auto v : value)
 						// {
