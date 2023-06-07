@@ -11,14 +11,14 @@ namespace plugin
 
 		bool Protobuf::DeliverStream(const u_char *data, uint64_t len)
 		{
-			std::cout << "Running: Protobuf::DeliverStream segment: " << len << std::endl;
+			// std::cout << "Running: Protobuf::DeliverStream segment: " << len << std::endl;
 
 			// Keeps the data in memory
 			for (uint64_t i = 0; i < len; i++)
 			{
 				u_char u = data[i];
 				buffer.push_back(u);
-				std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)u << " ";
+				// std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)u << " ";
 			}
 
 			return true;
@@ -27,14 +27,14 @@ namespace plugin
 		bool Protobuf::EndOfFile()
 		{
 
-			std::cout << "Running: Protobuf::EndOfFile size: " << buffer.size() << std::endl;
+			// std::cout << "Running: Protobuf::EndOfFile size: " << buffer.size() << std::endl;
 
-			for (uint64_t i = 0; i < buffer.size(); i++)
-			{
-				std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)buffer[i] << " ";
-			}
+			// for (uint64_t i = 0; i < buffer.size(); i++)
+			// {
+			// 	std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)buffer[i] << " ";
+			// }
 
-			// const auto [parts, _] = DecodeProto(buffer);
+			const auto [parts, _] = DecodeProto(buffer);
 
 			// ProtobufDisplay(parts);
 
@@ -49,6 +49,8 @@ namespace plugin
 
 			BufferReader reader = BufferReader(data);
 
+			reader.TrySkipGrpcHeader();
+
 			try
 			{
 				while (reader.LeftBytes() > 0)
@@ -62,7 +64,7 @@ namespace plugin
 					uint64_t index = indexType >> 3;
 					std::vector<u_char> value;
 
-					// uint64_t value = 0;
+					// std::cout << "index: " << index << " type: " << type << std::endl;
 
 					if (type == TYPES::VARINT)
 					{
@@ -89,10 +91,13 @@ namespace plugin
 
 					byteRangeEnd = reader.GetOffset();
 
+					std::cout << "byteRangeStart: " << byteRangeStart << " byteRangeEnd: " << byteRangeEnd << std::endl;
+					std::cout << "index: " << index << " type: " << type << std::endl;
+					std::cout << "value: ";
+
 					ProtobufPart part = {byteRangeEnd, byteRangeStart, index, type, value};
 					parts.push_back(part);
 
-					throw std::runtime_error("DEBUG");
 				}
 			}
 			catch (const std::exception &e)

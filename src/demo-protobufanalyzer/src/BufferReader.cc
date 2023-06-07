@@ -9,6 +9,11 @@ namespace plugin
 		{
 			buffer = data;
 			offset = 0;
+
+			// for (uint64_t i = 0; i < buffer.size(); i++)
+			// {
+			// 	std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)buffer[i] << " ";
+			// }
 		}
 
 		uint64_t BufferReader::GetOffset()
@@ -21,7 +26,7 @@ namespace plugin
 			const auto [value, length] = DecodeVarint(buffer, offset);
 			std::vector<u_char> data(buffer.begin() + offset, buffer.begin() + offset + length + 1);
 			offset += length;
-			std::cout << "Read varint: " << value << std::endl;
+			std::cout << "Read varint: " << value << " length:" << length << std::endl;
 			return std::make_tuple(value, data);
 		}
 
@@ -48,6 +53,30 @@ namespace plugin
 		void BufferReader::ResetToCheckpoint(void)
 		{
 			offset = savedOffset;
+		}
+
+		void BufferReader::TrySkipGrpcHeader()
+		{
+			uint64_t backupOffset = offset;
+
+			if (buffer[offset] == 0 && LeftBytes() >= 5)
+			{
+				offset++;
+				uint64_t length = ReadInt32BE(buffer, offset);
+				std::cout << "Grpc header length: " << length << std::endl;
+				offset += 4;
+
+				if (length > LeftBytes())
+				{
+					// Something is wrong, revert
+					offset = backupOffset;
+				}
+			}
+		}
+
+		int32_t BufferReader::ReadInt32BE(std::vector<u_char> data, uint64_t offset)
+		{
+			return (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3];
 		}
 
 	}
