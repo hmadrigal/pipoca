@@ -7,11 +7,17 @@
 #include <zeek/file_analysis/Component.h>
 #include <zeek/file_analysis/File.h>
 #include <zeek/file_analysis/Manager.h>
+#include <zeek/DebugLogger.h>
+
+#include <iostream>
+#include <iomanip>
+
 #include <tuple>
 #include <vector>
 
 #include "BufferReader.h"
 #include "events.bif.h"
+
 
 namespace plugin
 	{

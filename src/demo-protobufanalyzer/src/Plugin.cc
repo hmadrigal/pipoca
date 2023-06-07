@@ -10,6 +10,8 @@ zeek::plugin::Configuration Plugin::Configure()
 	plugin::Demo_ProtobufAnalyzer::plugin.AddComponent(new zeek::file_analysis::Component(
 		"PROTOBUF", plugin::Demo_ProtobufAnalyzer::Protobuf::Instantiate));
 
+	std::cout << "Running: plugin::Demo_ProtobufAnalyzer" << std::endl;
+	
 	zeek::plugin::Configuration config;
 	config.name = "Demo::ProtobufAnalyzer";
 	config.description = "Prototype for a ProtocolBuf decoder.";

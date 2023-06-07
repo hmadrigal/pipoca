@@ -1,37 +1,40 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 
 #include <zeek/Val.h>
 
 #include "VarintUtils.h"
 
-namespace plugin {
-namespace Demo_ProtobufAnalyzer {
-
-class BufferReader
+namespace plugin
+{
+	namespace Demo_ProtobufAnalyzer
 	{
 
-private:
-	std::vector<u_char> buffer;
-	uint64_t offset;
-	uint64_t savedOffset;
+		class BufferReader
+		{
 
-public:
-	BufferReader(std::vector<u_char> data);
+		private:
+			std::vector<u_char> buffer;
+			uint64_t offset;
+			uint64_t savedOffset;
 
-	uint64_t GetOffset();
+		public:
+			BufferReader(std::vector<u_char> data);
 
-	uint64_t LeftBytes();
+			uint64_t GetOffset();
 
-	void Checkpoint(void);
+			uint64_t LeftBytes();
 
-	void ResetToCheckpoint(void);
+			void Checkpoint(void);
 
-	std::tuple<uint64_t, std::vector<u_char>> ReadVarint();
+			void ResetToCheckpoint(void);
 
-	std::vector<u_char> ReadBuffer(uint64_t length);
-	};
+			std::tuple<uint64_t, std::vector<u_char>> ReadVarint();
+
+			std::vector<u_char> ReadBuffer(uint64_t length);
+		};
 
 	}
 }

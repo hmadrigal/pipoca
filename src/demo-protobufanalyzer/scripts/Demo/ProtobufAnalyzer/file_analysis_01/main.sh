@@ -1,6 +1,9 @@
 #/usr/bin/env bash
 
+# set -x
+
 rm -rf *.log *.json extract_files/
+
 zeek -C -r grpc-non-tls-dotnet.pcap main.zeek  > main.log
 
 for f in *.log; do

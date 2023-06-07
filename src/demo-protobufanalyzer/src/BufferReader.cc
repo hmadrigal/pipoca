@@ -21,6 +21,7 @@ namespace plugin
 			const auto [value, length] = DecodeVarint(buffer, offset);
 			std::vector<u_char> data(buffer.begin() + offset, buffer.begin() + offset + length + 1);
 			offset += length;
+			std::cout << "Read varint: " << value << std::endl;
 			return std::make_tuple(value, data);
 		}
 
@@ -44,10 +45,10 @@ namespace plugin
 			savedOffset = offset;
 		}
 
-        void BufferReader::ResetToCheckpoint(void)
-        {
+		void BufferReader::ResetToCheckpoint(void)
+		{
 			offset = savedOffset;
-        }
+		}
 
-    }
+	}
 }

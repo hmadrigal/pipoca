@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tuple>
+#include <iostream>
 
 #include <zeek/Val.h>
 

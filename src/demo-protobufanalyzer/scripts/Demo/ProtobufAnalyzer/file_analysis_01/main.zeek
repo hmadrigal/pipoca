@@ -36,9 +36,6 @@ redef record fa_file += {
     protobufinfo:          ProtobufInfo  &optional;
 };
 
-
-
-
 # =============================== Logic to detect gRPC over HTTP2 and request file analysis
 
 event http2_begin_entity(c: connection, is_orig: bool, stream: count, contentType: string) &priority=10
@@ -80,7 +77,8 @@ event file_sniff(f: fa_file, meta: fa_metadata) &priority=5
         && f$protobufinfo?$contentType 
         && f$protobufinfo$contentType == "application/grpc")
     {
-        print "PROTO FILE DETECTED!!";
+        print "PROTO FILE DETECTED!! Calling ANALYZER_PROTOBUF";
+        Files::add_analyzer(f, Files::ANALYZER_PROTOBUF);
     }
 }
 
