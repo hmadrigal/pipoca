@@ -19,19 +19,19 @@ namespace plugin
 					throw std::runtime_error("Buffer out of bounds");
 				}
 				currentByte = buffer[offset++];
-				std::cout << "Current byte: " << currentByte << " at " << offset-1 << std::endl;
+				// std::cout << "Current byte: " << currentByte << " at " << offset-1 << std::endl;
 				value |= (currentByte & 0x7f) << shift;
 				shift += 7;
 
 				counter++;
 				if (counter > 10)
 				{
-					std::cout << "Varint too long" << std::endl;
+					// std::cout << "Varint too long" << std::endl;
 					throw std::runtime_error("Varint too long");
 				}
 
-				//} while (currentByte & 0x80);
-			} while (currentByte >= 0x80);
+			} while (currentByte & 0x80);
+			//} while (currentByte >= 0x80);
 
 			return std::make_tuple(value, offset / 7);
 		}

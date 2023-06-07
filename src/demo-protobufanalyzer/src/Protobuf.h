@@ -26,8 +26,8 @@ namespace Demo_ProtobufAnalyzer
 
 typedef struct
 	{
-	uint64_t byteRangeEnd;
 	uint64_t byteRangeStart;
+	uint64_t byteRangeEnd;
 	uint64_t index;
 	uint64_t type;
 	std::vector<u_char> value;

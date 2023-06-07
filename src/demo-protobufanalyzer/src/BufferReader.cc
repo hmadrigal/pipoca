@@ -24,9 +24,10 @@ namespace plugin
 		std::tuple<uint64_t, std::vector<u_char>> BufferReader::ReadVarint()
 		{
 			const auto [value, length] = DecodeVarint(buffer, offset);
+			std::cout << "Read varint: " << value << " length:" << length << std::endl;
 			std::vector<u_char> data(buffer.begin() + offset, buffer.begin() + offset + length + 1);
 			offset += length;
-			std::cout << "Read varint: " << value << " length:" << length << std::endl;
+			// std::cout << "Read varint: " << value << " length:" << length << std::endl;
 			return std::make_tuple(value, data);
 		}
 
@@ -63,7 +64,7 @@ namespace plugin
 			{
 				offset++;
 				uint64_t length = ReadInt32BE(buffer, offset);
-				std::cout << "Grpc header length: " << length << std::endl;
+				// std::cout << "Grpc header length: " << length << std::endl;
 				offset += 4;
 
 				if (length > LeftBytes())

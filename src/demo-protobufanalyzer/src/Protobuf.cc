@@ -36,9 +36,19 @@ namespace plugin
 
 			const auto [parts, _] = DecodeProto(buffer);
 
-			// ProtobufDisplay(parts);
+			for (auto part : parts)
+			{
+				std::cout  << "byteRange: [" << part.byteRangeStart << "," << part.byteRangeEnd << "] index: " << part.index << " type: " << part.type << " value: ";
+				for (auto v : part.value)
+				{
+					// std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)v << " ";
+					std::cout << (int)v << " ";
+				}
+			}
+			
 
 			return true;
+			//return ProtobufDisplay(parts);
 		}
 
 		std::tuple<std::vector<ProtobufPart>, std::vector<u_char>>
@@ -74,7 +84,12 @@ namespace plugin
 					else if (type == TYPES::LENDELIM)
 					{
 						const auto [length, _] = reader.ReadVarint();
+						std::cout << "[LEN] TYPES::LENDELIM length: " << length << std::endl;
 						value = reader.ReadBuffer(length);
+						// for (auto v : value)
+						// {
+						// 	std::cout << (int)v << " ";
+						// }
 					}
 					else if (type == TYPES::FIXED32)
 					{
@@ -91,11 +106,11 @@ namespace plugin
 
 					byteRangeEnd = reader.GetOffset();
 
-					std::cout << "byteRangeStart: " << byteRangeStart << " byteRangeEnd: " << byteRangeEnd << std::endl;
-					std::cout << "index: " << index << " type: " << type << std::endl;
-					std::cout << "value: ";
+					// std::cout << "byteRangeStart: " << byteRangeStart << " byteRangeEnd: " << byteRangeEnd << std::endl;
+					// std::cout << "index: " << index << " type: " << type << std::endl;
+					// std::cout << "value: ";
 
-					ProtobufPart part = {byteRangeEnd, byteRangeStart, index, type, value};
+					ProtobufPart part = {byteRangeStart, byteRangeEnd, index, type, value};
 					parts.push_back(part);
 
 				}
