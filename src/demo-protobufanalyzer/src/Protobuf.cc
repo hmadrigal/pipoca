@@ -47,8 +47,8 @@ namespace plugin
 			}
 			
 
-			return true;
-			//return ProtobufDisplay(parts);
+			// return true;
+			return ProtobufDisplay(parts);
 		}
 
 		std::tuple<std::vector<ProtobufPart>, std::vector<u_char>>
