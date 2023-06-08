@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package todo;
+
+message TodoItem {
+  int32 id = 1;
+  string title = 2;
+  string description=3;
+  bool completed = 4;
+}
+
+message GetTodoItemsRequest {}
+
+message GetTodoItemsResponse {
+  repeated TodoItem items = 1;
+}
+
+message CreateTodoItemRequest {
+  string title = 1;
+}
+
+message CreateTodoItemResponse {
+  TodoItem item = 1;
+}
+
+message UpdateTodoItemRequest {
+  int32 id = 1;
+  string title = 2;
+  string description=3;
+  bool completed = 4;
+}
+
+message UpdateTodoItemResponse {
+  TodoItem item = 1;
+}
+
+message DeleteTodoItemRequest {
+  int32 id = 1;
+}
+
+message DeleteTodoItemResponse {}
+
+service TodoService {
+  rpc GetTodoItems(GetTodoItemsRequest) returns (GetTodoItemsResponse);
+  rpc CreateTodoItem(CreateTodoItemRequest) returns (CreateTodoItemResponse);
+  rpc UpdateTodoItem(UpdateTodoItemRequest) returns (UpdateTodoItemResponse);
+  rpc DeleteTodoItem(DeleteTodoItemRequest) returns (DeleteTodoItemResponse);
+}
