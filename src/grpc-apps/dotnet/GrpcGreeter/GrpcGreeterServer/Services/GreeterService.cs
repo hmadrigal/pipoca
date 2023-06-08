@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
+using Todo;
 
 namespace GrpcGreeter
 {
-    #region snippet
-    public class GreeterService : Greeter.GreeterBase
+    public class GreeterService : TodoService.TodoServiceBase
     {
         private readonly ILogger<GreeterService> _logger;
         public GreeterService(ILogger<GreeterService> logger)
@@ -16,13 +16,5 @@ namespace GrpcGreeter
             _logger = logger;
         }
 
-        public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
-        {
-            return Task.FromResult(new HelloReply
-            {
-                Message = "Hello " + request.Name
-            });
-        }
     }
-    #endregion
 }
