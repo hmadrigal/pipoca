@@ -1,13 +1,10 @@
 ﻿using System;
 using System.CommandLine;
 using System.CommandLine.Builder;
-using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Net.Client;
-using Microsoft.Extensions.Logging;
 
 internal class Program
 {
@@ -15,7 +12,6 @@ internal class Program
     //private const string variableServer = variablePrefix + "SERVER";
     // TODO: try to default to ENV VAR getDefaultValue: () => bool.Parse(Environment.GetEnvironmentVariable($"{variablePrefix}_TLS") ?? bool.FalseString)
     // TODO: try to default to ENV VAR getDefaultValue: () => Environment.GetEnvironmentVariable(variableServer)
-    //private static Func<Todo.TodoService.TodoServiceClient> _todoServiceClientFactory;
 
     private static async Task Main(string[] args)
     {
@@ -36,30 +32,7 @@ internal class Program
 
         var readIdOption = new Option<int?>("--id", "Id of the TODO target.") { IsRequired = false };
         var readCommand = new Command("read", "Get TODO items from the store.") { readIdOption };
-        readCommand.SetHandler(async (int? id) =>
-        {
-            if (id.HasValue)
-            {
-                Console.Out.WriteLine($"id: {id}");
-            }
-            var client = _todoServiceClientFactory();
-            var cts = new CancellationTokenSource();
-            var readTodoItemResponse = await client.GetTodoItemsAsync(new Todo.GetTodoItemsRequest
-            {
-            }, cancellationToken: cts.Token);
-
-            foreach (var item in readTodoItemResponse.Items)
-            {
-                Console.Out.WriteLine($"Read TODO item with id {item.Id}.");
-                Console.Out.WriteLine($"Title: {item.Title}");
-                Console.Out.WriteLine($"Description: {item.Description}");
-                Console.Out.WriteLine($"Completed: {item.Completed}");
-            }
-
-            Console.Out.WriteLine($"Read {readTodoItemResponse.Items.Count} TODO items.");
-
-
-        }, readIdOption);
+        readCommand.SetHandler(ReadCommandHandler, tlsOption, serverOption, readIdOption);
 
         // update command options
         var updateIdOption = new Option<int>("--id", "Id of the TODO target.") { IsRequired = true };
@@ -68,9 +41,12 @@ internal class Program
         var updateCompletedOption = new Option<bool?>("--completed", () => default, "New complete status of the existing TODO entry.") { IsRequired = false };
         var updateCommand = new Command("update", "Modifies an existing TODO item.") { updateIdOption, updateTitleOption, updateDescriptionOption, updateCompletedOption };
 
+        updateCommand.SetHandler(UpdateCommandHandler, tlsOption, serverOption, updateIdOption, updateTitleOption, updateDescriptionOption, updateCompletedOption);
+
         // delete command options
         var deleteIdOption = new Option<int>("--id", "Id of the TODO target.") { IsRequired = true };
         var deleteCommand = new Command("delete", "Removes an existing TODO item.") { deleteIdOption };
+        deleteCommand.SetHandler(DeleteCommandHandler, tlsOption, serverOption, deleteIdOption);
 
         // root command
         var rootCommand = new RootCommand() {
@@ -79,8 +55,6 @@ internal class Program
         rootCommand.AddGlobalOption(tlsOption);
         rootCommand.AddGlobalOption(serverOption);
 
-        //rootCommand.SetHandler(RootCommandHandler, tlsOption, serverOption);
-
         var parser = new CommandLineBuilder(rootCommand)
             .UseDefaults()
             .Build();
@@ -88,23 +62,53 @@ internal class Program
         Environment.ExitCode = await parser.InvokeAsync(args);
     }
 
-    //private static void RootCommandHandler(bool tls, string server)
-    //{
-    //    Console.Out.WriteLine($"tls: {tls}");
+    private static void UpdateCommandHandler(bool tls, string server, int id, string title, string description, bool? completed)
+    {
+        var (client, _) = GetNewClient(tls, server);
+        var cts = new CancellationTokenSource();
+        var updateTodoItemResponse = client.UpdateTodoItem(new Todo.UpdateTodoItemRequest
+        {
+            Id = id,
+            Title = title,
+            Description = description,
+            Completed = completed ?? false
+        }, cancellationToken: cts.Token);
 
-    //    Console.Out.WriteLine($"server: {server}");
+        Console.Out.WriteLine($"Updated TODO item with id {updateTodoItemResponse.Item.Id}.");
+    }
 
-    //    AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", tls);
-    //    Console.Out.WriteLine($"TLS is {(tls ? "enabled" : "disabled")}.");
+    private static void DeleteCommandHandler(bool tls, string server, int id)
+    {
+        var (client, _) = GetNewClient(tls, server);
+        var cts = new CancellationTokenSource();
+        _ = client.DeleteTodoItem(new Todo.DeleteTodoItemRequest
+        {
+            Id = id
+        }, cancellationToken: cts.Token);
 
-    //    _todoServiceClientFactory = () =>
-    //    {
-    //        using var channel = GrpcChannel.ForAddress(server);
-    //        var client = new Todo.TodoService.TodoServiceClient(channel);
-    //        return client;
-    //    };
+        Console.Out.WriteLine($"Deleted TODO item with id {id}.");
+    }
 
-    //}
+    private static async Task ReadCommandHandler(bool tls, string server, int? id)
+    {
+        var (client, _) = GetNewClient(tls, server);
+        var cts = new CancellationTokenSource();
+        var readTodoItemResponse = await client.GetTodoItemsAsync(new Todo.GetTodoItemsRequest
+        {
+        }, cancellationToken: cts.Token);
+
+        foreach (var item in readTodoItemResponse.Items)
+        {
+            Console.Out.WriteLine($"Read TODO item with id {item.Id}.");
+            Console.Out.WriteLine($"Title: {item.Title}");
+            Console.Out.WriteLine($"Description: {item.Description}");
+            Console.Out.WriteLine($"Completed: {item.Completed}");
+        }
+
+        Console.Out.WriteLine($"Read {readTodoItemResponse.Items.Count} TODO items.");
+
+
+    }
 
     private static async Task CreateCommandHandler(bool tls, string server, string title, string description, bool completed)
     {
@@ -114,14 +118,8 @@ internal class Program
         Console.Out.WriteLine($"description: {description}");
         Console.Out.WriteLine($"completed: {completed}");
 
-        if (tls)
-        {
-            Console.Out.WriteLine("TLS is enabled.");
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-        }
 
-        using var channel = GrpcChannel.ForAddress(server);
-        var client = new Todo.TodoService.TodoServiceClient(channel);
+        var (client, _) = GetNewClient(tls, server);
         var cts = new CancellationTokenSource();
         var createTodoItemResponse = await client.CreateTodoItemAsync(new Todo.CreateTodoItemRequest
         {
@@ -133,45 +131,18 @@ internal class Program
         Console.Out.WriteLine($"Created TODO item with id {createTodoItemResponse.Item.Id}.");
 
     }
+
+    private static (Todo.TodoService.TodoServiceClient client, GrpcChannel channel) GetNewClient(bool tls, string server)
+    {
+        GrpcChannel channel;
+        Todo.TodoService.TodoServiceClient client;
+        if (tls)
+        {
+            Console.Out.WriteLine("TLS is enabled.");
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+        }
+        channel = GrpcChannel.ForAddress(server);
+        client = new Todo.TodoService.TodoServiceClient(channel);
+        return (client, channel);
+    }
 }
-
-//// Disables TLS, this switch must be set before creating the GrpcChannel/HttpClient.
-//AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-
-//// The port number(5001) must match the port of the gRPC server.
-//var grpcServerUrlText = Environment.GetEnvironmentVariable("GRPC_SERVER_URL") ??
-//    (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "http://localhost:58634" : "http://localhost:5001");
-//Console.WriteLine($"gRPC Server URL: {grpcServerUrlText}");
-//if (!Uri.TryCreate(grpcServerUrlText, UriKind.Absolute, out var grpcServerUri))
-//{
-//    Console.WriteLine("Provide GRPC_SERVER_URL is not a valid Uri.");
-//}
-//using var channel = GrpcChannel.ForAddress(grpcServerUrlText);
-//var client = new Todo.TodoService.TodoServiceClient(channel);
-//var cts = new CancellationTokenSource();
-//var messagingTask = Task.Run(async () =>
-//{
-//    //const int callMax = 10;
-//    //var callCounter = 0;
-//    //while (true && callCounter < callMax)
-//    //{
-//    //    var reply = await client.SayHelloAsync(
-//    //                  new HelloRequest { Name = "GreeterClient" });
-//    //    Console.WriteLine($"[{DateTime.Now:O}] Greeting: {reply.Message}");
-//    //    await Task.Delay(1500);
-//    //    callCounter++;
-//    //}
-//    await Task.Yield();
-//    // TODO: call the service
-//}, cts.Token);
-
-//if (Debugger.IsAttached)
-//{
-//    Console.WriteLine("Press any key to exit...");
-//    while (Console.ReadKey().Key != ConsoleKey.Enter) { }
-//    cts.Cancel();
-//}
-//else
-//{
-//    await messagingTask;
-//}
