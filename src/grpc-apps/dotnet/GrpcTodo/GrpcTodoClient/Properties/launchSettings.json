@@ -2,7 +2,7 @@
   "profiles": {
     "GrpcGreeterClient": {
       "commandName": "Project",
-      "commandLineArgs": "create --title \"test\" --description \"lorem ipsum\""
+      "commandLineArgs": "create --server \"http://localhost:58634\" --title \"test\" --description \"lorem ipsum\""
     },
     "Docker": {
       "commandName": "Docker"
