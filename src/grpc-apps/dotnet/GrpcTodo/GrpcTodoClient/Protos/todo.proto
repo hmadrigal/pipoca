@@ -17,6 +17,8 @@ message GetTodoItemsResponse {
 
 message CreateTodoItemRequest {
   string title = 1;
+  string description=2;
+  bool completed = 3;
 }
 
 message CreateTodoItemResponse {

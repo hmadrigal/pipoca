@@ -1,7 +1,8 @@
 {
   "profiles": {
     "GrpcGreeterClient": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "create --title \"test\" --description \"lorem ipsum\""
     },
     "Docker": {
       "commandName": "Docker"
