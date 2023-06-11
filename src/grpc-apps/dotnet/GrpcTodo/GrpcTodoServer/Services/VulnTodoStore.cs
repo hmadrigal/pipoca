@@ -4,7 +4,7 @@ using System.IO;
 
 namespace GrpcTodoServer.Services
 {
-    public class TodoStore : ITodoStore
+    public class VulnTodoStore
     {
 
         private static string databaseFilePath = Path.Combine(Environment.CurrentDirectory, "todo.db");
@@ -37,7 +37,7 @@ namespace GrpcTodoServer.Services
             createTableCmd.ExecuteNonQuery();
         }
 
-        public TodoStore()
+        public VulnTodoStore()
         {
             Initialize();
         }
@@ -47,14 +47,12 @@ namespace GrpcTodoServer.Services
         {
             using var connection = GetConnection();
             var insertCmd = connection.CreateCommand();
-            insertCmd.CommandText = @"
+            insertCmd.CommandText = @$"
                     INSERT INTO TodoItems (Title, Description, IsDone)
-                    VALUES ($title, $description, $isDone);
+                    VALUES (""{title}"", ""{description}"", {(isDone ? 1 : 0)});
                     SELECT last_insert_rowid();
                 ";
-            insertCmd.Parameters.AddWithValue("$title", title);
-            insertCmd.Parameters.AddWithValue("$description", description);
-            insertCmd.Parameters.AddWithValue("$isDone", isDone);
+
             return Convert.ToInt32(insertCmd.ExecuteScalar());
         }
 
@@ -63,15 +61,11 @@ namespace GrpcTodoServer.Services
         {
             using var connection = GetConnection();
             var updateCmd = connection.CreateCommand();
-            updateCmd.CommandText = @"
+            updateCmd.CommandText = @$"
                     UPDATE TodoItems
-                    SET Title = $title, Description = $description, IsDone = $isDone
-                    WHERE Id = $id;
+                    SET Title = ""{title}"", Description = ""{description}"", IsDone = {(isDone ? 1 : 0)}
+                    WHERE Id = {id};
                 ";
-            updateCmd.Parameters.AddWithValue("$id", id);
-            updateCmd.Parameters.AddWithValue("$title", title);
-            updateCmd.Parameters.AddWithValue("$description", description);
-            updateCmd.Parameters.AddWithValue("$isDone", isDone);
             updateCmd.ExecuteNonQuery();
         }
 
@@ -80,11 +74,10 @@ namespace GrpcTodoServer.Services
         {
             using var connection = GetConnection();
             var deleteCmd = connection.CreateCommand();
-            deleteCmd.CommandText = @"
+            deleteCmd.CommandText = @$"
                     DELETE FROM TodoItems
-                    WHERE Id = $id;
+                    WHERE Id = {id};
                 ";
-            deleteCmd.Parameters.AddWithValue("$id", id);
             deleteCmd.ExecuteNonQuery();
         }
 

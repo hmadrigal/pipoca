@@ -9,11 +9,11 @@ namespace GrpcTodoClient
     public class TodoService : Todo.TodoService.TodoServiceBase
     {
         private readonly ILogger _logger;
-        private readonly TodoStore _todoStore;
+        private readonly ITodoStore _todoStore;
 
         public TodoService(
             ILogger<TodoService> logger,
-            TodoStore todoStore
+            ITodoStore todoStore
         )
         {
             _logger = logger;
