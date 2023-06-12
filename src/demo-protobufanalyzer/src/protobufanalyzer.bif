@@ -1,1 +1,31 @@
 
+%%{
+#include "libinjection/libinjection.h"
+#include "libinjection/libinjection_sqli.h"
+
+#include <cstring>
+#include <cctype>
+#include <zeek/util.h>
+#include <zeek/ZeekString.h>
+#include <zeek/Val.h>
+
+#include <iostream>
+
+using namespace std;
+
+%%}
+
+function is_sql_injection%(s: string, len: int%) : bool
+    %{
+
+        // printf("[is_sql_injection] --->>> s=%s", c_str(s->ToStdString()) );
+
+        //char* data = util::copy_string( s->CheckString() );
+        char* data = &(s->ToStdString())[0];
+        struct libinjection_sqli_state state;
+        
+        libinjection_sqli_init(&state, data, len, FLAG_NONE);
+        
+        return make_intrusive<zeek::BoolVal>( libinjection_is_sqli(&state) != 0 ) ;
+
+    %}

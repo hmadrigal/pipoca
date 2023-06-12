@@ -6,7 +6,7 @@ project(ZeekPluginProtobufAnalyzer)
 include(ZeekPlugin)
 
 zeek_plugin_begin(Demo ProtobufAnalyzer ${ZEEK_PLUGIN_BEGIN_OPTS})
-zeek_plugin_cc(src/Plugin.cc src/BufferReader.cc src/Protobuf.cc src/VarintUtils.cc)
+zeek_plugin_cc(src/Plugin.cc src/BufferReader.cc src/Protobuf.cc src/VarintUtils.cc src/libinjection/libinjection_sqli.c)
 zeek_plugin_bif(src/protobufanalyzer.bif)
 zeek_plugin_bif(src/events.bif)
 zeek_plugin_dist_files(README CHANGES COPYING VERSION)
