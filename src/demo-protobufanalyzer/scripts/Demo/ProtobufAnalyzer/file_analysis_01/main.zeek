@@ -269,7 +269,10 @@ event protobuf_string(f: fa_file, text: string)
     print "[protobuf_string]";
     print "    text", text;
     print "text", text;
+    local someText = "1' AND 1=1";
     local result_is_sql_injection = is_sql_injection(text, |text|);
     print "is_sql_injection", result_is_sql_injection;
 
+    # local result_is_sql_injection = is_sql_injection(someText, |someText|);
+    # print "is_sql_injection", result_is_sql_injection;
 }
