@@ -4,7 +4,8 @@
 
 rm -rf *.log *.json extract_files/
 
-zeek -C -r grpc-non-tls-dotnet.pcap main.zeek  > main.log
+# zeek -C -r grpc-non-tls-dotnet.pcap main.zeek  > main.log
+zeek -C -r grpc-non-tls-dotnet-with-vuln.pcap main.zeek  > main.log
 
 for f in *.log; do
 
