@@ -2,9 +2,14 @@
 
 # set -x
 
+_pcap_file="gRPC-TodoApp-Over-HTTP.pcap"
+
+# grpc-non-tls-dotnet.pcap
+# gRPC-TodoApp-Over-HTTP.pcap
+
 rm -rf *.log *.json extract_files/
 
-zeek -C -r grpc-non-tls-dotnet.pcap main.zeek  > main.log
+zeek -C -r "${_pcap_file}" main.zeek  > main.log
 
 for f in *.log; do
 
