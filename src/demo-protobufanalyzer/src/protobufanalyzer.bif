@@ -24,7 +24,7 @@ function libinjection::is_sql_injection%(s: string, len: int%) : bool
         int issqli;
 
         const char* input =  reinterpret_cast<const char *>(s->Bytes());
-        printf(" ===================> %s\n", input);
+        // printf(" ===================> %s\n", input);
 
         size_t slen = strlen(input);
 

@@ -102,6 +102,9 @@ event http2_content_type(c: connection, is_orig: bool, stream: count, contentTyp
         c$http2$proto$stream = stream;
         c$http2$proto$is_orig = is_orig;
     }
+
+    print "";
+
 }
 
 event file_over_new_connection(f: fa_file, c: connection, is_orig: bool) &priority=5
@@ -118,6 +121,8 @@ event file_over_new_connection(f: fa_file, c: connection, is_orig: bool) &priori
     }else{
         print "    no http2 info on connection";
     }
+
+    print "";
 
 }
 
@@ -140,6 +145,8 @@ event file_sniff(f: fa_file, meta: fa_metadata) &priority=5
     }else {
         print "    no proto info on file";
     }
+
+    print "";
 }
 
 # =============================== Handling gRPC text event
@@ -151,5 +158,12 @@ event protobuf_string(f: fa_file, text: string)
     local is_sql_injection = libinjection::is_sql_injection(text, |text|);
 
     print "    is_sql_injection", is_sql_injection;
+
+    if ( is_sql_injection )
+    {
+        print "    ===> SQL INJECTION DETECTED!! *** ";
+    }
+
+    print "";
 
 }
