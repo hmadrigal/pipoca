@@ -15,28 +15,22 @@ using namespace std;
 
 %%}
 
-function is_sql_injection%(s: string, len: int%) : bool
+function libinjection::is_sql_injection%(s: string, len: int%) : bool
     %{
 
-        // printf("[is_sql_injection] --->>> s=%s", c_str(s->ToStdString()) );
-
-        //char* data = util::copy_string( s->CheckString() );
-        //char* data = &(s->ToStdString())[0];
-        //struct libinjection_sqli_state state;
-        
-        //libinjection_sqli_init(&state, data, len, FLAG_NONE);
-        
-        //return make_intrusive<zeek::BoolVal>( libinjection_is_sqli(&state) != 0 ) ;
+        // printf(" ===================> %s\n", s->Bytes());
 
         struct libinjection_sqli_state state;
         int issqli;
 
-        const char* input =  &(s->ToStdString())[0];
-        size_t slen = len;
+        const char* input =  reinterpret_cast<const char *>(s->Bytes());
+        printf(" ===================> %s\n", input);
 
-        /* in real-world, you would url-decode the input, etc */
+        size_t slen = strlen(input);
 
         libinjection_sqli_init(&state, input, slen, FLAG_NONE);
         issqli = libinjection_is_sqli(&state);
+
         return make_intrusive<zeek::BoolVal>(issqli != 0);
+
     %}
