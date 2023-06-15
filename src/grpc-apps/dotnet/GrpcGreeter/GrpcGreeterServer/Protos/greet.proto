@@ -1,48 +1,21 @@
 syntax = "proto3";
 
-package todo;
+option csharp_namespace = "GrpcGreeter";
 
-message TodoItem {
-  int32 id = 1;
-  string title = 2;
-  string description=3;
-  bool completed = 4;
+package greet;
+
+// The greeting service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply);
 }
 
-message GetTodoItemsRequest {}
-
-message GetTodoItemsResponse {
-  repeated TodoItem items = 1;
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
 }
 
-message CreateTodoItemRequest {
-  string title = 1;
-}
-
-message CreateTodoItemResponse {
-  TodoItem item = 1;
-}
-
-message UpdateTodoItemRequest {
-  int32 id = 1;
-  string title = 2;
-  string description=3;
-  bool completed = 4;
-}
-
-message UpdateTodoItemResponse {
-  TodoItem item = 1;
-}
-
-message DeleteTodoItemRequest {
-  int32 id = 1;
-}
-
-message DeleteTodoItemResponse {}
-
-service TodoService {
-  rpc GetTodoItems(GetTodoItemsRequest) returns (GetTodoItemsResponse);
-  rpc CreateTodoItem(CreateTodoItemRequest) returns (CreateTodoItemResponse);
-  rpc UpdateTodoItem(UpdateTodoItemRequest) returns (UpdateTodoItemResponse);
-  rpc DeleteTodoItem(DeleteTodoItemRequest) returns (DeleteTodoItemResponse);
+// The response message containing the greetings.
+message HelloReply {
+  string message = 1;
 }
