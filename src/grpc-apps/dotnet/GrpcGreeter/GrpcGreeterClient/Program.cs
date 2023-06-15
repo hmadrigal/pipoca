@@ -32,7 +32,7 @@ namespace GrpcGreeterClient
             var cts = new CancellationTokenSource();
             var messagingTask = Task.Run(async () =>
             {
-                const int callMax = 10;
+                const int callMax = 1;
                 var callCounter = 0;
                 while (true && callCounter < callMax)
                 {
