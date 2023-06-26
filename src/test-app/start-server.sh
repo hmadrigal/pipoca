@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Example run:
+# sudo  ./start-server.sh
+
 if [[ $EUID > 0 ]]; then
   echo "Please run as root/sudo"
   exit 1
