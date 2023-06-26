@@ -6,4 +6,4 @@ if [[ $EUID > 0 ]]; then
 fi
 
 export ASPNETCORE_URLS="http://*:80"
-./bin/GrpcTodoServer
+./bin/GrpcTodoServer/GrpcTodoServer
