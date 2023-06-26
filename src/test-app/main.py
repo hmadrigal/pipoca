@@ -9,8 +9,8 @@ def exec_todo_create_with(payload_file, server_url):
 
     with open(payload_file, 'r') as f:
         for line in f:
-            title = shlex.quote(line)
-            command = f'./bin/GrpcTodoClient/GrpcTodoClient create --server {server_url} --title "Title {line_counter} - {title}" --description "Description {line_counter}"'
+            title = shlex.quote(f"Title {line_counter} - {line}")
+            command = f'./bin/GrpcTodoClient/GrpcTodoClient create --server {server_url} --title {title} --description "Description {line_counter}"'
             print(f'Executing command: {command}')
             os.system(command)
 
