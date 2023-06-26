@@ -3,22 +3,22 @@
 
 set -ex
 
+CURRENT_DIR=${PWD}
+mkdir -p ./bin
 # check if server binary is already built
 if [ ! -f ./bin/GrpcTodoServer/GrpcTodoServer ]; then
-    # build server binary
-    mkdir -p ./bin/GrpcTodoServer
-    BIN_DIR=$(cd ./bin/GrpcTodoServer && pwd)
     cd ../grpc-apps/dotnet/GrpcTodo/GrpcTodoServer
-    dotnet publish --sc -c Release -o $BIN_DIR
-    cd $OLDPWD
+    rm -rf ./bin/Release/net7.0/linux-x64/publish
+    dotnet publish --sc -c Release
+    mv ./bin/Release/net7.0/linux-x64/publish ${CURRENT_DIR}/bin/GrpcTodoServer
+    cd ${CURRENT_DIR}
 fi
 
 # check if client binary is already built
 if [ ! -f ./bin/GrpcTodoClient/GrpcTodoClient ]; then
-    # build client binary
-    mkdir -p ./bin/GrpcTodoClient
-    BIN_DIR=$(cd ./bin/GrpcTodoClient && pwd)
     cd ../grpc-apps/dotnet/GrpcTodo/GrpcTodoClient
-    dotnet publish --sc -c Release -o $BIN_DIR
-    cd $OLDPWD
+    rm -rf ./bin/Release/net7.0/linux-x64/publish
+    dotnet publish --sc -c Release
+    mv ./bin/Release/net7.0/linux-x64/publish ${CURRENT_DIR}/bin/GrpcTodoClient
+    cd ${CURRENT_DIR}
 fi

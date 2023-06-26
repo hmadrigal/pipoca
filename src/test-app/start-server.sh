@@ -7,5 +7,5 @@ fi
 
 ip addr
 
-export ASPNETCORE_URLS="http://*:80"
-./bin/GrpcTodoServer/GrpcTodoServer
+cd ./bin/GrpcTodoServer/
+ASPNETCORE_URLS=${ASPNETCORE_URLS:-"http://*:80"} ./GrpcTodoServer
