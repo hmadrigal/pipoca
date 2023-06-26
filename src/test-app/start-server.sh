@@ -5,5 +5,7 @@ if [[ $EUID > 0 ]]; then
   exit 1
 fi
 
+ip addr
+
 export ASPNETCORE_URLS="http://*:80"
 ./bin/GrpcTodoServer/GrpcTodoServer
