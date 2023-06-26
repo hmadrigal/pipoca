@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Run example:
+# sudo GRPC_TODO_SERVER=http://172.16.210.133 ./run-tests.sh
+
 set -e
 
 # Check envvar GRPC_TODO_SERVER is not empty 
@@ -13,20 +16,29 @@ if [[ $EUID > 0 ]]; then
   exit 1
 fi
 
-# Build the binary
-./build-bin.sh
+function exec_test_and_capture(){
+    local payload_file=$1
+    local capture_file=$2
 
-# Start tcpdump in the background
-tcpdump -i ens33 -s 0 -w owap-positive-waf-matches.pcap port 80 &
-TCPDUMP_PID=$!
+    # Build the binary
+    ./build-bin.sh
 
-# Wait for tcpdump to start
-sleep 1
+    # Start tcpdump in the background
+    tcpdump -i ens33 -s 0 -w "${capture_file}" port 80 &
+    TCPDUMP_PID=$!
 
-# Starts tests
-python3 main.py
+    # Wait for tcpdump to start
+    sleep 1
 
-# Kill tcpdump
-kill $TCPDUMP_PID
+    # Starts tests
+    export GRPC_TODO_PAYLOAD_FILE="${payload_file}"
+    ./main.py
+    unset GRPC_TODO_PAYLOAD_FILE
 
+    # Kill tcpdump
+    kill $TCPDUMP_PID
+}
 
+mkdir -p ./traces
+
+exec_test_and_capture "./payloads/owap-positive-waf-matches.txt" "./traces/owap-positive-waf-matches.pcap"

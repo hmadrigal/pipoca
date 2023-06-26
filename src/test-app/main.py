@@ -22,9 +22,14 @@ def main():
         print('GRPC_TODO_SERVER environment variable not set. Set it ot the server URL and restart the app.')
         sys.exit(1)
 
+    # check server variable GRPC_TODO_SERVER is set
+    if 'GRPC_TODO_PAYLOAD_FILE' not in os.environ:
+        print('GRPC_TODO_PAYLOAD_FILE environment variable not set. Set it to a text file with SQLi injections.')
+        sys.exit(1)
+
     # reads a text file and iterates over each line
     server_url = os.environ['GRPC_TODO_SERVER']
-    payload_file = './payloads/owap-positive-waf-matches.txt'
+    payload_file = os.environ['GRPC_TODO_PAYLOAD_FILE'] # './payloads/owap-positive-waf-matches.txt'
     command = exec_todo_create_with(payload_file, server_url)
 
 
