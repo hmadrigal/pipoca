@@ -4,3 +4,4 @@ Initial tests using `Spicy`, trying out `init-plugin` command, and last checking
 
 The directory `deprecated` contains the code related to the proof of concept.
 The directory `grpc-apps` contains applications that uses gRPC, meant to be used for testing.
+The directory  `test-app` contains apps which use gRPC apps in order to send positive-positive and positive-negative tests.

