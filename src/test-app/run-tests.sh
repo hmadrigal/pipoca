@@ -41,9 +41,10 @@ function exec_test_and_capture(){
 
 mkdir -p ./traces
 
-exec_test_and_capture "./payloads/zeek-negative-matches.txt" "./traces/zeek-negative-matches.pcap"
-exec_test_and_capture "./payloads/zeek-positive-matches.txt" "./traces/zeek-positive-matches.pcap"
-exec_test_and_capture "./payloads/payloadbox-generic-sqli-positive.txt" "./traces/payloadbox-generic-sqli-positive.pcap"
-exec_test_and_capture "./payloads/payloadbox-mysql-injection-bypass-positive.txt" "./traces/payloadbox-mysql-injection-bypass-positive.pcap"
-exec_test_and_capture "./payloads/payloadbox-mysql-injection-local-files-positive.txt" "./traces/payloadbox-mysql-injection-local-files-positive.pcap"
-exec_test_and_capture "./payloads/owap-positive-waf-matches.txt" "./traces/owap-positive-waf-matches.pcap"
+for i in $( find ./payloads/ -type f ); do 
+  f=$( basename "${i}" .txt )
+  echo "Running test ${f}"
+  time exec_test_and_capture "./payloads/${f}.txt" "./traces/${f}.pcap"
+done
+
+sleep 1
