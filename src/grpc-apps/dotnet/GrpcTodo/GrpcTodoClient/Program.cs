@@ -2,6 +2,7 @@
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Net.Client;
@@ -28,6 +29,14 @@ internal class Program
 
         createCommand.SetHandler(CreateCommandHandler, tlsOption, serverOption, createTitleOption, createDescriptionOption, createCompletedOption);
 
+        // create batch command options
+        var createBatchFilePathOption = new Option<string>("--filepath", "File path with titles") { IsRequired = true };
+        var createBatchTitleFormat = new Option<string>("--format", () => "{0}", "Description of the new TODO entry.") { IsRequired = false };
+        var createBatchCommand = new Command("create-batch", "Creates a batch of TODO items.")
+        { createBatchFilePathOption, createBatchTitleFormat };
+
+        createBatchCommand.SetHandler(CreateBatchCommandHandler, tlsOption, serverOption, createBatchFilePathOption, createBatchTitleFormat);
+
         // read command options
 
         var readIdOption = new Option<int?>("--id", "Id of the TODO target.") { IsRequired = false };
@@ -50,7 +59,7 @@ internal class Program
 
         // root command
         var rootCommand = new RootCommand() {
-            createCommand, readCommand, updateCommand, deleteCommand
+            createCommand, createBatchCommand, readCommand, updateCommand, deleteCommand
         };
         rootCommand.AddGlobalOption(tlsOption);
         rootCommand.AddGlobalOption(serverOption);
@@ -107,6 +116,42 @@ internal class Program
 
         Console.Out.WriteLine($"Read {readTodoItemResponse.Items.Count} TODO items.");
 
+
+    }
+
+    private static async Task CreateBatchCommandHandler(bool tls, string server, string filepath, string format)
+    {
+        Console.Out.WriteLine($"tls: {tls}");
+        Console.Out.WriteLine($"server: {server}");
+        Console.Out.WriteLine($"filepath: {filepath}");
+        Console.Out.WriteLine($"format: {format}");
+
+        var counterNewTodoItems = 0;
+        var (client, _) = GetNewClient(tls, server);
+        var cts = new CancellationTokenSource();
+        var lines = File.ReadLines(filepath);
+
+        foreach(var line in lines)
+        {
+
+            if (string.IsNullOrWhiteSpace(line))
+            { continue; }
+            var formatted_line = line.TrimEnd('\n');
+            formatted_line = string.Format(format,formatted_line);
+
+            var createTodoItemResponse = await client.CreateTodoItemAsync(new Todo.CreateTodoItemRequest
+            {
+                Title = formatted_line,
+                Description = string.Empty,
+                Completed = false
+            }, cancellationToken: cts.Token);
+
+            counterNewTodoItems++;
+            Console.Out.WriteLine($"Created TODO item with id {createTodoItemResponse.Item.Id}.");
+
+        }
+
+        Console.Out.WriteLine($"Created {counterNewTodoItems} TODO items.");
 
     }
 
