@@ -30,3 +30,5 @@ Hence, each request performs a 'create' call with a payload from `payload` direc
 ```shell
 sudo GRPC_TODO_SERVER=http://172.16.210.133 ./run-tests.sh
 ```
+- `GRPC_TODO_TEST_CLEAN` used to specify to use paylaod as it is. Set it to `true`
+- `GRPC_TODO_SERVER` use it to specify the gRPC server
