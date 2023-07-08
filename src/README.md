@@ -13,5 +13,20 @@ The directory `test-app` contains a directory `payloads`, this directory contain
 
 This, there are two main scripts which starts a given application and capture the traffic.
 
-- `start-server.sh` It starts the gRPC server application, and capture the traffic automatically.
-- `run-tests.sh`. It uses the gRPC client application to perform requests. Each request performs a 'create' call with a payload from `payload` directory. The `payload` directory withholds samples of SQLi from [sql-injection-payload-list]([https://](https://github.com/payloadbox/sql-injection-payload-list/tree/master)).
+### `build-bin.sh` 
+Build client and server binaries for GrpcTodo server and client
+
+### `start-server.sh` 
+It starts GrpcTodo server and capture sits traffic.
+
+```shell
+sudo ./start-server.sh
+```
+
+### `run-tests.sh`
+It executes multiples requests using GrpcTodo client and consuming data from payload directory, each line of each file is used to perform a  gRPC call.
+Hence, each request performs a 'create' call with a payload from `payload` directory. The `payload` directory withholds samples of SQLi from [sql-injection-payload-list]([https://](https://github.com/payloadbox/sql-injection-payload-list/tree/master)).
+
+```shell
+sudo GRPC_TODO_SERVER=http://172.16.210.133 ./run-tests.sh
+```
