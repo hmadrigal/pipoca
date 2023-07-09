@@ -138,7 +138,7 @@ internal class Program
             if (string.IsNullOrWhiteSpace(line))
             { continue; }
             var formatted_line = line.TrimEnd('\n');
-            formatted_line = string.Format(format,formatted_line);
+            formatted_line = string.Format(format,formatted_line, counter);
 
             var createTodoItemResponse = await client.CreateTodoItemAsync(new Todo.CreateTodoItemRequest
             {

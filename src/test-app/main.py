@@ -31,7 +31,7 @@ def exec_todo_create_with(payload_file, server_url):
 
 def exec_batch_create_with(payload_file, server_url):
 
-    format="Title {0}"
+    format="Title {1} {0}"
     if os.environ.get('GRPC_TODO_TEST_CLEAN', '').lower() == 'true':
         format="{0}"
     log = f'./traces/{os.path.basename(payload_file)}.log'
