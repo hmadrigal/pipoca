@@ -20,9 +20,6 @@ function exec_test_and_capture(){
     local payload_file=$1
     local capture_file=$2
 
-    # Build the binary
-    ./build-bin.sh
-
     # Start tcpdump in the background
     tcpdump -i ens33 -s 0 -w "${capture_file}" port 80 &
     TCPDUMP_PID=$!
@@ -39,8 +36,14 @@ function exec_test_and_capture(){
     kill $TCPDUMP_PID
 }
 
+
+# Build the binary
+./build-bin.sh
+
+# Create output dir
 mkdir -p ./traces
 
+# Run tests
 for i in $( find ./payloads/ -type f ); do 
   f=$( basename "${i}" .txt )
   echo "Running test ${f}"
