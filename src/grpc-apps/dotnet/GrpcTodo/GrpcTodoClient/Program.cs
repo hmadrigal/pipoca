@@ -130,6 +130,7 @@ internal class Program
         var (client, _) = GetNewClient(tls, server);
         var cts = new CancellationTokenSource();
         var lines = File.ReadLines(filepath);
+        int counter = 0;
 
         foreach(var line in lines)
         {
@@ -138,7 +139,6 @@ internal class Program
             { continue; }
             var formatted_line = line.TrimEnd('\n');
             formatted_line = string.Format(format,formatted_line);
-            int counter = 0;
 
             var createTodoItemResponse = await client.CreateTodoItemAsync(new Todo.CreateTodoItemRequest
             {
