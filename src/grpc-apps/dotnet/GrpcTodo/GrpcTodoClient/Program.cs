@@ -138,11 +138,12 @@ internal class Program
             { continue; }
             var formatted_line = line.TrimEnd('\n');
             formatted_line = string.Format(format,formatted_line);
+            int counter = 0;
 
             var createTodoItemResponse = await client.CreateTodoItemAsync(new Todo.CreateTodoItemRequest
             {
                 Title = formatted_line,
-                Description = string.Empty,
+                Description = $"Description {++counter} ",
                 Completed = false
             }, cancellationToken: cts.Token);
 
