@@ -20,20 +20,25 @@ function exec_test_and_capture(){
     local payload_file=$1
     local capture_file=$2
 
-    # Start tcpdump in the background
-    tcpdump -i ens33 -s 0 -w "${capture_file}" port 80 &
-    TCPDUMP_PID=$!
+    # # Start tcpdump in the background
+    # tcpdump -i ens33 -s 0 -w "${capture_file}" port 80 &
+    # TCPDUMP_PID=$!
 
     # Wait for tcpdump to start
-    sleep 1
+    # sleep 1
+
+    echo "Running test with payload ${payload_file}"
+    echo "Press enter to continue."
+    read
 
     # Starts tests
     export GRPC_TODO_PAYLOAD_FILE="${payload_file}"
     ./main.py
     unset GRPC_TODO_PAYLOAD_FILE
 
-    # Kill tcpdump
-    kill $TCPDUMP_PID
+    echo "Test finished."
+    # # Kill tcpdump
+    # kill $TCPDUMP_PID
 }
 
 
