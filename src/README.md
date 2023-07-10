@@ -33,3 +33,11 @@ sudo GRPC_TODO_SERVER=http://172.16.210.133 ./run-tests.sh
 - `GRPC_TODO_TEST_CLEAN` used to specify to use payload as it is. Set it to `true`
 - `GRPC_TODO_SERVER` used it to specify the gRPC server
 - `GRPC_TODO_TEST_BATCH` used to specify batch processing rather than individual calls. Set it to `true`
+
+> **REMARK** `run-tests.sh` works along with `capture.sh`.
+
+### `catpure.sh`
+
+Execute network traffic captures.
+
+> **REMARK** `capture.sh` works along with `run-tests.sh`.
